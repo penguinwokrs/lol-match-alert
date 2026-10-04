@@ -234,7 +234,7 @@
     <value>マッチの通知中です。終わってからもう一度お試しください。</value>
   </data>
   <data name="Editor_PreviewEnded" xml:space="preserve">
-    <value>マッチが見つかったため、確認を止めました。</value>
+    <value>通知のためにキーボードが使われたので、確認を止めました。</value>
   </data>
   <data name="Editor_PreviewFailed" xml:space="preserve">
     <value>{0} で確認できませんでした: {1}</value>

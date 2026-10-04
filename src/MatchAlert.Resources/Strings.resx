@@ -234,7 +234,7 @@ Use "Test lighting" to see it now.</value>
     <value>A match alert is playing. Try again when it ends.</value>
   </data>
   <data name="Editor_PreviewEnded" xml:space="preserve">
-    <value>Preview stopped: a match was found.</value>
+    <value>Preview stopped: the keyboard was needed for an alert.</value>
   </data>
   <data name="Editor_PreviewFailed" xml:space="preserve">
     <value>Could not preview on {0}: {1}</value>

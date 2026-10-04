@@ -141,12 +141,14 @@ internal sealed partial class PatternEditorWindow : Window
             pattern.SelectedItem = pattern.Items.Cast<ComboBoxItem>().FirstOrDefault(i => (string?)i.Tag == choice.Pattern) ?? pattern.Items[0];
 
             var id = profile.Id;
-            on.Click += (_, _) =>
+            RoutedEventHandler toggled = (_, _) =>
             {
                 bool value = on.IsChecked == true;
                 _choices[id] = (value == profile.EnabledByDefault ? null : value, _choices.GetValueOrDefault(id).Pattern);
                 Changed(patternEdited: false);
             };
+            on.Checked += toggled;
+            on.Unchecked += toggled;
             pattern.SelectionChanged += (_, _) =>
             {
                 if (_loading || pattern.SelectedItem is not ComboBoxItem item) return;
@@ -179,6 +181,7 @@ internal sealed partial class PatternEditorWindow : Window
 
         ShowStep();
         Restart();
+        UpdateNotes();
     }
 
     private void ShowStep()
@@ -276,12 +279,15 @@ internal sealed partial class PatternEditorWindow : Window
         };
         HexBox.KeyDown += (_, e) => { if (e.Key == Key.Enter) ApplyHex(); };
         HexBox.LostFocus += (_, _) => ApplyHex();
-        OffBox.Click += (_, _) =>
+        RoutedEventHandler off = (_, _) =>
         {
+            if (_loading) return;
             Step.Color = OffBox.IsChecked == true ? new Rgb(0, 0, 0) : _lastLit;
             ShowStep();
             Changed();
         };
+        OffBox.Checked += off;
+        OffBox.Unchecked += off;
         BrightnessSlider.ValueChanged += (_, _) =>
         {
             if (_loading) return;
@@ -318,7 +324,11 @@ internal sealed partial class PatternEditorWindow : Window
         RenameButton.Click += (_, _) => RenamePattern();
         DeleteButton.Click += (_, _) => DeleteOrReset();
 
-        LiveBox.Click += async (_, _) => await (LiveBox.IsChecked == true ? StartLiveAsync() : StopLiveAsync());
+        // Checked/Unchecked rather than Click: UI Automation (screen readers, scripts) toggles a check box
+        // without clicking it. Unticking from code - a failed start, a match taking over - lands in
+        // StopLiveAsync with nothing to stop.
+        LiveBox.Checked += async (_, _) => await StartLiveAsync();
+        LiveBox.Unchecked += async (_, _) => await StopLiveAsync();
         LiveDeviceBox.SelectionChanged += async (_, _) =>
         {
             if (_live is null) return;

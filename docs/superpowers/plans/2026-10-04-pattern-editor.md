@@ -33,7 +33,7 @@
 - [x] `UseWPF`; `PatternEditorWindow` (dark theme), `TimelineControl` (blocks, resize thumb, drag to reorder, add), `ColorWheel` (hue/sat disk + hex), preview strip on a `DispatcherTimer`.
 - [x] Pattern list with New / Duplicate / Rename / Delete-or-Reset; repeat; keyboards panel with enabled + pattern + default; notes; keyboard preview switch and device choice; Save / Close with unsaved-changes prompt.
 - [x] Tray menu item; `--edit-patterns` opens it directly; strings en/ja.
-- [x] Screenshots on Windows in both languages; hardware preview on the Q1 HE 8K; commit `Tray: pattern editor`.
+- [ ] Screenshots on Windows in both languages; hardware preview on the Q1 HE 8K; commit `Tray: pattern editor`.
 
 ### Task 5: Ship
-- [x] README (en/ja) sections; PR with verified / not verified.
+- [ ] README (en/ja) sections; PR with verified / not verified.
