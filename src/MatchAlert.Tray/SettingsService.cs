@@ -11,36 +11,6 @@ namespace MatchAlert.Tray;
 /// </summary>
 internal sealed class SettingsService : IDisposable
 {
-    private const string Template = """
-        {
-          // Which pattern plays when a match is found. Built in:
-          //   "match-found"  red and white, swapping every 300 ms
-          //   "pulse"        gold, breathing
-          //   "steady"       solid gold
-          // or the name of one of your own below.
-          "pattern": "match-found",
-
-          // Your own patterns. color is #RRGGBB (#000000 is off), brightness is 0-100,
-          // durationMs is how long each step shows. effect is "solid" (default) or "breathing".
-          "patterns": {
-            // "blue-blink": {
-            //   "steps": [
-            //     { "color": "#0080FF", "durationMs": 250 },
-            //     { "color": "#000000", "durationMs": 250 }
-            //   ]
-            // }
-          },
-
-          // Per keyboard: "pattern" overrides the one above, "enabled": false leaves it alone.
-          // The ids are in the tray menu under Keyboards.
-          // "devices": { "keychron-q1-he-8k": { "pattern": "pulse" } },
-
-          // Safety stop, in seconds, in case the client never leaves the ready check.
-          "maxAlertSeconds": 30
-        }
-
-        """;
-
     private readonly FileLog _log;
     private readonly FileSystemWatcher _watcher;
     private readonly System.Threading.Timer _debounce;
@@ -50,7 +20,7 @@ internal sealed class SettingsService : IDisposable
     {
         _log = log;
         Directory.CreateDirectory(AppPaths.DevicesDirectory);
-        if (!File.Exists(AppPaths.SettingsFile)) File.WriteAllText(AppPaths.SettingsFile, Template);
+        if (!File.Exists(AppPaths.SettingsFile)) File.WriteAllText(AppPaths.SettingsFile, Resources.Strings.SettingsTemplate);   // in the UI language, so its comments can be read
 
         Current = SettingsLoader.Load(SettingsSources.BuiltIn());
         Reload();

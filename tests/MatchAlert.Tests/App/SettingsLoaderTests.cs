@@ -76,6 +76,15 @@ public class SettingsLoaderTests
         Assert.Equal(3, s.PatternFor(Profile(s, Q1)).RepeatCount);
     }
 
+    [Theory]
+    [InlineData(null, "auto")]
+    [InlineData("""{ "language": "ja" }""", "ja")]
+    [InlineData("""{ "language": "en" }""", "en")]
+    public void Language_defaults_to_following_windows(string? json, string expected)
+    {
+        Assert.Equal(expected, Load(json).Language);
+    }
+
     [Fact]
     public void Devices_can_be_switched_off()
     {
@@ -130,6 +139,7 @@ public class SettingsLoaderTests
     [InlineData("""{ "patterns": { "p": { "repeat": "forever", "steps": [ { "color": "#FF0000" } ] } } }""", "patterns.p.repeat")]
     [InlineData("""{ "devices": { "keychron-q1-he-8k": { "pattern": "nope" } } }""", "devices.keychron-q1-he-8k.pattern")]
     [InlineData("""{ "maxAlertSeconds": 0 }""", "maxAlertSeconds")]
+    [InlineData("""{ "language": "fr" }""", "language")]
     [InlineData("""{ "patern": "steady" }""", "patern")]
     public void Mistakes_name_the_file_and_the_field(string json, string path)
     {

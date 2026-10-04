@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Status_Alerting" xml:space="preserve">
+    <value>Match found</value>
+  </data>
+  <data name="Status_Connected" xml:space="preserve">
+    <value>Waiting for a match</value>
+  </data>
+  <data name="Status_WaitingForClient" xml:space="preserve">
+    <value>Waiting for the League client</value>
+  </data>
+  <data name="Menu_Keyboards" xml:space="preserve">
+    <value>Keyboards</value>
+  </data>
+  <data name="Menu_Test" xml:space="preserve">
+    <value>Test lighting</value>
+  </data>
+  <data name="Menu_Setup" xml:space="preserve">
+    <value>Set up a keyboard…</value>
+  </data>
+  <data name="Menu_OpenSettings" xml:space="preserve">
+    <value>Open settings folder</value>
+  </data>
+  <data name="Menu_Autostart" xml:space="preserve">
+    <value>Start with Windows</value>
+  </data>
+  <data name="Menu_Exit" xml:space="preserve">
+    <value>Exit</value>
+  </data>
+  <data name="Menu_SettingsProblem" xml:space="preserve">
+    <value>Settings problem: click to open the folder</value>
+  </data>
+  <data name="Balloon_SettingsTitle" xml:space="preserve">
+    <value>Settings not applied</value>
+  </data>
+  <data name="Balloon_SettingsText" xml:space="preserve">
+    <value>{0}
+The previous settings are still in use.</value>
+  </data>
+  <data name="Keyboards_ItemTooltip" xml:space="preserve">
+    <value>id for settings.json: {0}
+click to copy it</value>
+  </data>
+  <data name="Keyboards_Off" xml:space="preserve">
+    <value>off</value>
+  </data>
+  <data name="Keyboards_None" xml:space="preserve">
+    <value>No set-up keyboard is connected</value>
+  </data>
+  <data name="Test_NoKeyboard" xml:space="preserve">
+    <value>No set-up keyboard is connected. Connect it with a USB cable, or use "Set up a keyboard…".</value>
+  </data>
+  <data name="Setup_Caption" xml:space="preserve">
+    <value>Set up a keyboard</value>
+  </data>
+  <data name="Setup_AlertPlaying" xml:space="preserve">
+    <value>A match alert is playing. Try again once it is over.</value>
+  </data>
+  <data name="Setup_NothingNew" xml:space="preserve">
+    <value>There is no new keyboard to set up.
+
+Keyboards already set up are under Keyboards. A keyboard must be connected by USB cable (not wireless or Bluetooth) and support VIA.</value>
+  </data>
+  <data name="Setup_WhichDevice" xml:space="preserve">
+    <value>Which device is the keyboard to set up?</value>
+  </data>
+  <data name="Setup_Done" xml:space="preserve">
+    <value>{0} is set up and will light up on the next match.
+
+Use "Test lighting" to see it now.</value>
+  </data>
+  <data name="Setup_Stopped" xml:space="preserve">
+    <value>Setup stopped: {0}</value>
+  </data>
+  <data name="Balloon_NoKeyboardTitle" xml:space="preserve">
+    <value>No keyboard set up yet</value>
+  </data>
+  <data name="Balloon_NoKeyboardText" xml:space="preserve">
+    <value>Click here to set up your keyboard.</value>
+  </data>
+  <data name="Prompt_DeviceDetails" xml:space="preserve">
+    <value>Device details</value>
+  </data>
+  <data name="Prompt_CopyDetails" xml:space="preserve">
+    <value>Copy details</value>
+  </data>
+  <data name="SettingsTemplate" xml:space="preserve">
+    <value>{
+  // Which pattern plays when a match is found. Built in:
+  //   "match-found"  red and white, swapping every 300 ms
+  //   "pulse"        gold, breathing
+  //   "steady"       solid gold
+  // or the name of one of your own below.
+  "pattern": "match-found",
+
+  // Your own patterns. color is #RRGGBB (#000000 is off), brightness is 0-100,
+  // durationMs is how long each step shows. effect is "solid" (default) or "breathing".
+  "patterns": {
+    // "blue-blink": {
+    //   "steps": [
+    //     { "color": "#0080FF", "durationMs": 250 },
+    //     { "color": "#000000", "durationMs": 250 }
+    //   ]
+    // }
+  },
+
+  // Per keyboard: "pattern" overrides the one above, "enabled": false leaves it alone.
+  // The ids are in the tray menu under Keyboards.
+  // "devices": { "keychron-q1-he-8k": { "pattern": "pulse" } },
+
+  // Safety stop, in seconds, in case the client never leaves the ready check.
+  "maxAlertSeconds": 30,
+
+  // Menu language: "auto" follows Windows, or "en" / "ja". Applies on the next start.
+  "language": "auto"
+}
+</value>
+  </data>
+</root>

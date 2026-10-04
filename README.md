@@ -1,5 +1,7 @@
 # lol-match-alert
 
+English · [日本語](README.ja.md)
+
 Your keyboard flashes the moment League of Legends finds a match, and goes back to your own lighting
 when the ready check is over. Tab out, make tea, look at the keyboard.
 
@@ -91,6 +93,7 @@ If something is wrong, the tray says what and where, and keeps using the previou
 | `repeat` | `"untilStopped"` (default) or a number of rounds, after which the last step holds |
 | `devices.<id>` | Per keyboard: `pattern` to override, `"enabled": false` to leave it alone. The id is in the tray menu under Keyboards (click to copy) |
 | `maxAlertSeconds` | Safety stop, default 30 |
+| `language` | Menu and wizard language: `"auto"` (follows Windows, default), `"en"` or `"ja"`. Applies on the next start |
 
 Built-in patterns:
 

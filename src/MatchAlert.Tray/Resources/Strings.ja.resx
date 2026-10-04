@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Status_Alerting" xml:space="preserve">
+    <value>マッチが見つかりました</value>
+  </data>
+  <data name="Status_Connected" xml:space="preserve">
+    <value>マッチ待ち</value>
+  </data>
+  <data name="Status_WaitingForClient" xml:space="preserve">
+    <value>League クライアントの起動待ち</value>
+  </data>
+  <data name="Menu_Keyboards" xml:space="preserve">
+    <value>キーボード</value>
+  </data>
+  <data name="Menu_Test" xml:space="preserve">
+    <value>テスト点灯</value>
+  </data>
+  <data name="Menu_Setup" xml:space="preserve">
+    <value>キーボードを設定…</value>
+  </data>
+  <data name="Menu_OpenSettings" xml:space="preserve">
+    <value>設定フォルダーを開く</value>
+  </data>
+  <data name="Menu_Autostart" xml:space="preserve">
+    <value>Windows の起動時に開始</value>
+  </data>
+  <data name="Menu_Exit" xml:space="preserve">
+    <value>終了</value>
+  </data>
+  <data name="Menu_SettingsProblem" xml:space="preserve">
+    <value>設定に問題があります（クリックでフォルダーを開く）</value>
+  </data>
+  <data name="Balloon_SettingsTitle" xml:space="preserve">
+    <value>設定を適用できませんでした</value>
+  </data>
+  <data name="Balloon_SettingsText" xml:space="preserve">
+    <value>{0}
+直前の設定のまま動作しています。</value>
+  </data>
+  <data name="Keyboards_ItemTooltip" xml:space="preserve">
+    <value>settings.json で使う id: {0}
+クリックでコピー</value>
+  </data>
+  <data name="Keyboards_Off" xml:space="preserve">
+    <value>オフ</value>
+  </data>
+  <data name="Keyboards_None" xml:space="preserve">
+    <value>設定済みのキーボードが接続されていません</value>
+  </data>
+  <data name="Test_NoKeyboard" xml:space="preserve">
+    <value>設定済みのキーボードが接続されていません。USB ケーブルでつなぐか、「キーボードを設定…」を使ってください。</value>
+  </data>
+  <data name="Setup_Caption" xml:space="preserve">
+    <value>キーボードの設定</value>
+  </data>
+  <data name="Setup_AlertPlaying" xml:space="preserve">
+    <value>マッチの通知中です。終わってからもう一度お試しください。</value>
+  </data>
+  <data name="Setup_NothingNew" xml:space="preserve">
+    <value>新しく設定できるキーボードがありません。
+
+設定済みのキーボードは「キーボード」に表示されます。キーボードは USB ケーブルで接続し（無線や Bluetooth では動きません）、VIA に対応している必要があります。</value>
+  </data>
+  <data name="Setup_WhichDevice" xml:space="preserve">
+    <value>設定するキーボードはどれですか？</value>
+  </data>
+  <data name="Setup_Done" xml:space="preserve">
+    <value>{0} を設定しました。次のマッチから光ります。
+
+「テスト点灯」で今すぐ確認できます。</value>
+  </data>
+  <data name="Setup_Stopped" xml:space="preserve">
+    <value>設定を中断しました: {0}</value>
+  </data>
+  <data name="Balloon_NoKeyboardTitle" xml:space="preserve">
+    <value>キーボードが未設定です</value>
+  </data>
+  <data name="Balloon_NoKeyboardText" xml:space="preserve">
+    <value>ここをクリックしてキーボードを設定してください。</value>
+  </data>
+  <data name="Prompt_DeviceDetails" xml:space="preserve">
+    <value>デバイスの詳細</value>
+  </data>
+  <data name="Prompt_CopyDetails" xml:space="preserve">
+    <value>詳細をコピー</value>
+  </data>
+  <data name="SettingsTemplate" xml:space="preserve">
+    <value>{
+  // マッチが見つかったときに再生するパターン。組み込みは次の 3 つ:
+  //   "match-found"  赤と白が 300 ms ごとに入れ替わる
+  //   "pulse"        金色でゆっくり明滅する
+  //   "steady"       金色で点灯する
+  // 下で自分で定義したパターンの名前も指定できます。
+  "pattern": "match-found",
+
+  // 自分のパターン。color は #RRGGBB（#000000 は消灯）、brightness は 0-100、
+  // durationMs は各ステップを表示する時間（ミリ秒）。effect は "solid"（既定）か "breathing"。
+  "patterns": {
+    // "blue-blink": {
+    //   "steps": [
+    //     { "color": "#0080FF", "durationMs": 250 },
+    //     { "color": "#000000", "durationMs": 250 }
+    //   ]
+    // }
+  },
+
+  // キーボードごとの設定。"pattern" で上のパターンを上書き、"enabled": false でそのキーボードは光らせない。
+  // id はトレイメニューの「キーボード」に表示されます。
+  // "devices": { "keychron-q1-he-8k": { "pattern": "pulse" } },
+
+  // 安全のための停止時間（秒）。クライアントが Accept 画面から進まない場合に備えます。
+  "maxAlertSeconds": 30,
+
+  // メニューの言語: "auto" は Windows に合わせる。"en" / "ja" で固定。次回起動時に反映されます。
+  "language": "auto"
+}
+</value>
+  </data>
+</root>

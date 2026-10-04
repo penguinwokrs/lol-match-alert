@@ -21,6 +21,9 @@ public static class SettingsLoader
     public const int DefaultMinStepMs = 100;
     public const int DefaultMaxAlertSeconds = 30;
 
+    /// <summary>The UI languages there are translations for. "auto" follows the Windows display language.</summary>
+    public static readonly IReadOnlyList<string> Languages = ["auto", "en", "ja"];
+
     private static readonly JsonSerializerOptions Json = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -83,8 +86,12 @@ public static class SettingsLoader
         int maxSeconds = user.MaxAlertSeconds ?? DefaultMaxAlertSeconds;
         if (maxSeconds is < 1 or > 600) throw Error(userSource, "maxAlertSeconds", "must be 1-600 seconds");
 
+        var language = user.Language ?? "auto";
+        if (!Languages.Contains(language))
+            throw Error(userSource, "language", $"must be one of {string.Join(", ", Languages.Select(l => $"\"{l}\""))}");
+
         var disabled = (user.Devices ?? []).Where(d => d.Value.Enabled == false).Select(d => d.Key).ToHashSet(StringComparer.Ordinal);
-        return new ResolvedSettings(patterns, profiles.Values.ToList(), patternByDevice, disabled, TimeSpan.FromSeconds(maxSeconds));
+        return new ResolvedSettings(patterns, profiles.Values.ToList(), patternByDevice, disabled, TimeSpan.FromSeconds(maxSeconds), language);
     }
 
     /// <summary>Writes a profile in the same shape <see cref="Load"/> reads, for the setup wizard to save.</summary>
@@ -217,6 +224,7 @@ public static class SettingsLoader
         public Dictionary<string, PatternDto>? Patterns { get; set; }
         public Dictionary<string, DeviceSettingsDto>? Devices { get; set; }
         public int? MaxAlertSeconds { get; set; }
+        public string? Language { get; set; }
     }
 
     private sealed class DeviceSettingsDto
