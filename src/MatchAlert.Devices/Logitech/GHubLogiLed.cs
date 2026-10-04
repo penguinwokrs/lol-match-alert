@@ -20,7 +20,8 @@ public sealed unsafe class GHubLogiLed : ILogiLed
 
     private readonly nint _library;
     // The SDK's functions return C++ bool, one byte: read as byte rather than trust bool marshalling.
-    private readonly delegate* unmanaged[Cdecl]<byte*, byte> _initWithName;
+    private readonly delegate* unmanaged[Cdecl]<byte*, byte> _initWithName;   // null on SDKs that predate it
+    private readonly delegate* unmanaged[Cdecl]<byte> _init;
     private readonly delegate* unmanaged[Cdecl]<int, byte> _setTargetDevice;
     private readonly delegate* unmanaged[Cdecl]<byte> _saveCurrentLighting;
     private readonly delegate* unmanaged[Cdecl]<int, int, int, byte> _setLighting;
@@ -32,7 +33,10 @@ public sealed unsafe class GHubLogiLed : ILogiLed
     private GHubLogiLed(nint library)
     {
         _library = library;
-        _initWithName = (delegate* unmanaged[Cdecl]<byte*, byte>)Export("LogiLedInitWithName");
+        _init = (delegate* unmanaged[Cdecl]<byte>)Export("LogiLedInit");
+        _initWithName = NativeLibrary.TryGetExport(library, "LogiLedInitWithName", out var named)
+            ? (delegate* unmanaged[Cdecl]<byte*, byte>)named
+            : null;
         _setTargetDevice = (delegate* unmanaged[Cdecl]<int, byte>)Export("LogiLedSetTargetDevice");
         _saveCurrentLighting = (delegate* unmanaged[Cdecl]<byte>)Export("LogiLedSaveCurrentLighting");
         _setLighting = (delegate* unmanaged[Cdecl]<int, int, int, byte>)Export("LogiLedSetLighting");
@@ -79,9 +83,10 @@ public sealed unsafe class GHubLogiLed : ILogiLed
         }
     }
 
+    /// <summary>With a name G HUB can show, where the SDK supports one (it takes a narrow char*).</summary>
     public bool Init(string appName)
     {
-        // LogiLedInitWithName takes a narrow char*.
+        if (_initWithName == null) return _init() != 0;
         var name = Encoding.ASCII.GetBytes(appName + "\0");
         fixed (byte* p = name) return _initWithName(p) != 0;
     }
