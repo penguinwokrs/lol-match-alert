@@ -1,0 +1,68 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (C) 2026 penguinwokrs
+
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Work out the version
+        id: version
+        shell: bash
+        run: echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - run: dotnet test MatchAlert.sln
+        shell: bash
+
+      - name: Publish
+        shell: bash
+        env:
+          VERSION: ${{ steps.version.outputs.value }}
+        run: dotnet publish src/MatchAlert.Tray -c Release -p:Version="$VERSION" -p:DebugType=none -o dist/app
+
+      - name: Make sure Inno Setup is present
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if (-not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe")) { choco install innosetup --no-progress -y }
+
+      - name: Build the installer
+        shell: pwsh
+        env:
+          LMA_VERSION: ${{ steps.version.outputs.value }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" installer\lol-match-alert.iss
+
+      # Through env, not interpolated: a tag may contain characters PowerShell would expand.
+      - name: Zip the portable build
+        shell: pwsh
+        env:
+          VERSION: ${{ steps.version.outputs.value }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Copy-Item LICENSE, NOTICE, README.md dist\app\
+          Compress-Archive -Path dist\app\* -DestinationPath "dist\lol-match-alert-${env:VERSION}-win-x64.zip"
+
+      - name: Create the release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --generate-notes \
+            dist/lol-match-alert-*-setup.exe dist/lol-match-alert-*-win-x64.zip

@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="MatchAlert.Tests" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MatchAlert.Domain\MatchAlert.Domain.csproj" />
+    <ProjectReference Include="..\MatchAlert.App\MatchAlert.App.csproj" />
+  </ItemGroup>
+</Project>

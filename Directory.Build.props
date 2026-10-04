@@ -1,0 +1,14 @@
+<Project>
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <Product>lol-match-alert</Product>
+    <Company>penguinwokrs</Company>
+    <Copyright>Copyright (C) 2026 penguinwokrs</Copyright>
+    <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+    <IsPackable>false</IsPackable>
+    <!-- A local build reports this; the release workflow passes -p:Version from the tag. -->
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+</Project>

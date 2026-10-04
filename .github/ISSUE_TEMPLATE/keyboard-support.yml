@@ -1,0 +1,26 @@
+name: Keyboard support
+description: Ask for a keyboard the setup wizard could not set up
+labels: [keyboard]
+body:
+  - type: input
+    id: model
+    attributes:
+      label: Keyboard model
+      placeholder: e.g. Keychron V1 Max
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Device details
+      description: From the wizard's "Copy details" button.
+      render: text
+    validations:
+      required: true
+  - type: dropdown
+    id: via
+    attributes:
+      label: Does the keyboard work with the VIA app (usevia.app) or Keychron Launcher?
+      options: ["Yes", "No", "Not sure"]
+    validations:
+      required: true
