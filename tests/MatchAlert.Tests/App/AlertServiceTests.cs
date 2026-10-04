@@ -174,7 +174,12 @@ public class AlertServiceTests : IAsyncLifetime
 
         var test = service.TestAsync(TimeSpan.FromSeconds(3), CancellationToken.None);
         await Eventually.True(() => q1.Last?.Shown.Count > 0);
-        _time.Advance(TimeSpan.FromSeconds(3));
+        // The test's own delay may not exist yet; keep the clock moving until it is over.
+        while (!test.IsCompleted)
+        {
+            _time.Advance(TimeSpan.FromSeconds(1));
+            await Task.Delay(10);
+        }
         await test;
 
         Assert.True(q1.Last!.Disposed);

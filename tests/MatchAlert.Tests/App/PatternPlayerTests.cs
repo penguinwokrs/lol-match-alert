@@ -3,7 +3,6 @@
 
 using MatchAlert.App;
 using MatchAlert.Domain;
-using Microsoft.Extensions.Time.Testing;
 
 namespace MatchAlert.Tests.App;
 
@@ -12,7 +11,7 @@ public class PatternPlayerTests
     private static readonly Step Red = new(Rgb.Parse("#FF0000"), 100, "solid", null, 300);
     private static readonly Step White = new(Rgb.Parse("#FFFFFF"), 100, "solid", null, 300);
 
-    private readonly FakeTimeProvider _time = new();
+    private readonly CountingTimeProvider _time = new();
     private readonly FakeSession _session = new();
     private readonly CancellationTokenSource _cts = new();
 
@@ -21,6 +20,8 @@ public class PatternPlayerTests
 
     private async Task Advance(int ms, int expectShown)
     {
+        // Every step shown starts one delay; wait for it before moving the clock.
+        await Eventually.True(() => _time.Timers >= _session.Shown.Count, "player waiting");
         _time.Advance(TimeSpan.FromMilliseconds(ms));
         await Eventually.True(() => _session.Shown.Count >= expectShown, $"{expectShown} steps shown");
     }

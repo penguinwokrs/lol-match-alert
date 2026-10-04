@@ -53,6 +53,22 @@ internal sealed class FakeDeviceSource(params ILightingDevice[] devices) : IDevi
     public void RecoverInterruptedSessions() => Recovered++;
 }
 
+/// <summary>
+/// A fake clock that counts the timers created on it, so a test can wait for code under test to
+/// start waiting before moving time on. Advancing first would be lost: the timer is not there yet.
+/// </summary>
+internal sealed class CountingTimeProvider : Microsoft.Extensions.Time.Testing.FakeTimeProvider
+{
+    private int _timers;
+    public int Timers => Volatile.Read(ref _timers);
+
+    public override ITimer CreateTimer(TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period)
+    {
+        Interlocked.Increment(ref _timers);
+        return base.CreateTimer(callback, state, dueTime, period);
+    }
+}
+
 internal static class Eventually
 {
     /// <summary>Waits for work that background tasks finish on their own schedule.</summary>
