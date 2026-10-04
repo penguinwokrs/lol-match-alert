@@ -95,7 +95,10 @@ public static class SettingsLoader
             .Select(p => p.Id)
             .Concat((user.Devices ?? []).Where(d => d.Value.Enabled == false).Select(d => d.Key))
             .ToHashSet(StringComparer.Ordinal);
-        return new ResolvedSettings(patterns, profiles.Values.ToList(), patternByDevice, disabled, TimeSpan.FromSeconds(maxSeconds), language);
+        var builtInPatterns = builtIn.ToDictionary(p => p.Key, p => ToPattern(p.Key, p.Value, "built-in patterns"), StringComparer.Ordinal);
+        var userPatterns = (user.Patterns ?? []).Keys.ToHashSet(StringComparer.Ordinal);
+        return new ResolvedSettings(patterns, profiles.Values.ToList(), patternByDevice, disabled, TimeSpan.FromSeconds(maxSeconds), language,
+            builtInPatterns, userPatterns);
     }
 
     /// <summary>Writes a profile in the same shape <see cref="Load"/> reads, for the setup wizard to save.</summary>
