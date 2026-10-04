@@ -8,4 +8,9 @@
   <ItemGroup>
     <ProjectReference Include="..\MatchAlert.Domain\MatchAlert.Domain.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <!-- Named explicitly: default manifest names differ between Windows and Linux builds. -->
+    <EmbeddedResource Include="BuiltIn\patterns.json" LogicalName="builtin/patterns.json" />
+    <EmbeddedResource Include="BuiltIn\devices\*.json" LogicalName="builtin/devices/%(Filename)%(Extension)" />
+  </ItemGroup>
 </Project>

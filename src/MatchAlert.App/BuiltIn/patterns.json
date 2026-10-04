@@ -1,0 +1,18 @@
+{
+  // Red and white, swapping every 300 ms. Hard to miss from across the room.
+  "match-found": {
+    "repeat": "untilStopped",
+    "steps": [
+      { "color": "#FF0000", "brightness": 100, "durationMs": 300 },
+      { "color": "#FFFFFF", "brightness": 100, "durationMs": 300 }
+    ]
+  },
+  // Gold, breathing with the keyboard's own animation.
+  "pulse": {
+    "steps": [ { "color": "#FFB000", "brightness": 100, "effect": "breathing", "speed": 200 } ]
+  },
+  // Solid gold.
+  "steady": {
+    "steps": [ { "color": "#FFB000", "brightness": 100 } ]
+  }
+}

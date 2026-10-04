@@ -1,0 +1,14 @@
+{
+  // Verified on hardware (factory firmware, VIA protocol 13). The product id differs by layout:
+  // 0x1010 ANSI, 0x1011 ISO, 0x1012 JIS. A Link-KM dock also answers on 0x3434 (0xD026) and is
+  // left out on purpose.
+  "id": "keychron-q1-he-8k",
+  "name": "Keychron Q1 HE 8K",
+  "driver": "via",
+  "match": { "vendorId": "0x3434", "productIds": [ "0x1010", "0x1011", "0x1012" ], "productString": "Q1 HE" },
+  "effects": { "solid": 1, "breathing": 2 },
+  "minStepMs": 100,
+  // rgb_matrix is custom channel 3. The firmware resets color and brightness ~50-150 ms after an
+  // effect change, which resetOnEffect works around.
+  "via": { "channel": 3, "resetOnEffect": true }
+}
