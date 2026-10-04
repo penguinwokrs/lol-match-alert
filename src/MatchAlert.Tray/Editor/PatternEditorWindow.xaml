@@ -281,7 +281,7 @@
     <DockPanel Grid.Row="4" Margin="0,16,0,0" LastChildFill="True">
       <CheckBox x:Name="LiveBox" DockPanel.Dock="Left" FontWeight="SemiBold" />
       <ComboBox x:Name="LiveDeviceBox" DockPanel.Dock="Left" Width="260" Margin="12,0,0,0" />
-      <Button x:Name="CloseButton" DockPanel.Dock="Right" />
+      <Button x:Name="CancelButton" DockPanel.Dock="Right" />
       <Button x:Name="SaveButton" DockPanel.Dock="Right" Background="#FF2A5DB0" BorderBrush="#FF3B6FC4" />
       <TextBlock x:Name="StatusText" VerticalAlignment="Center" Margin="16,0" Foreground="{StaticResource Quiet}" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
     </DockPanel>

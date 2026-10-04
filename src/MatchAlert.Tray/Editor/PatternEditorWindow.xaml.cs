@@ -336,8 +336,9 @@ internal sealed partial class PatternEditorWindow : Window
             await StartLiveAsync();
         };
 
-        SaveButton.Click += (_, _) => Save();
-        CloseButton.Click += (_, _) => Close();
+        SaveButton.Click += (_, _) => { if (Save()) Close(); };
+        // Cancel throws the edits away; only the window's own close button asks about them.
+        CancelButton.Click += (_, _) => { _dirty = false; Close(); };
     }
 
     private void SetEffect(string effect)
@@ -585,7 +586,6 @@ internal sealed partial class PatternEditorWindow : Window
             return false;
         }
         _dirty = false;
-        StatusText.Text = Strings.Editor_Saved;
         _log.Write("Editor: saved settings.json");
         return true;
     }
@@ -683,7 +683,7 @@ internal sealed partial class PatternEditorWindow : Window
         DefaultLabel.Text = Strings.Editor_DefaultPattern;
         LiveBox.Content = Strings.Editor_PreviewOnKeyboard;
         SaveButton.Content = Strings.Editor_Save;
-        CloseButton.Content = Strings.Editor_Close;
+        CancelButton.Content = Strings.Editor_Cancel;
     }
 
     private void SetIcon()

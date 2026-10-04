@@ -177,7 +177,7 @@ Tray menu, **Edit patterns…**. Each pattern is a row of color blocks, each as 
 - notes warn when a keyboard will stretch a step, lacks an effect, or has not been tried on hardware.
 
 Built-in patterns can be changed too, and **Reset to built-in** puts them back. **Save** writes
-`settings.json`; the previous version is kept as `settings.json.bak`, because the editor does not keep
+`settings.json` and closes the window; **Cancel** closes it without saving. The previous version is kept as `settings.json.bak`, because the editor does not keep
 the file's comments.
 
 ### settings.json

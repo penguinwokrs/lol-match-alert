@@ -242,12 +242,6 @@
   <data name="Editor_Save" xml:space="preserve">
     <value>保存</value>
   </data>
-  <data name="Editor_Close" xml:space="preserve">
-    <value>閉じる</value>
-  </data>
-  <data name="Editor_Saved" xml:space="preserve">
-    <value>保存しました。</value>
-  </data>
   <data name="Editor_SaveFailed" xml:space="preserve">
     <value>保存できませんでした: {0}</value>
   </data>

@@ -45,7 +45,7 @@ Opened from the tray menu ("Edit patterns…"). Dark theme, matching OpenInzone'
 │  Speed  ─────●───  (breathing)     │  [x] Keychron Q1 HE 8K   [default ▼]    │
 │  Duration [300] ms  [◀][▶][Remove] │  [x] Logitech G (G HUB)  [pulse ▼]      │
 │                                    │  Default pattern [match-found ▼]        │
-│ [●] Preview on keyboard [Keychron Q1 HE 8K ▼]          [Save] [Close]       │
+│ [●] Preview on keyboard [Keychron Q1 HE 8K ▼]          [Save] [Cancel]      │
 └──────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -58,7 +58,8 @@ Opened from the tray menu ("Edit patterns…"). Dark theme, matching OpenInzone'
 - **Notes** show, per keyboard the pattern is assigned to or previewed on: steps shorter than its
   `minStepMs` (they will be stretched), effects it does not have, and devices that show breathing steady
   (Razer, OpenRGB) or are unverified.
-- **Unsaved changes** are asked about on close.
+- **Save** saves and closes; if saving fails the window stays open with the reason. **Cancel** closes
+  without saving. Closing the window any other way asks about unsaved changes.
 
 ## Keyboard preview
 

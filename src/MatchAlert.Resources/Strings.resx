@@ -242,12 +242,6 @@ Use "Test lighting" to see it now.</value>
   <data name="Editor_Save" xml:space="preserve">
     <value>Save</value>
   </data>
-  <data name="Editor_Close" xml:space="preserve">
-    <value>Close</value>
-  </data>
-  <data name="Editor_Saved" xml:space="preserve">
-    <value>Saved.</value>
-  </data>
   <data name="Editor_SaveFailed" xml:space="preserve">
     <value>Not saved: {0}</value>
   </data>
