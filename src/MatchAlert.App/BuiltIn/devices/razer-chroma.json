@@ -1,0 +1,15 @@
+{
+  // Every Razer Chroma device, through Razer's Chroma SDK - not over HID. Synapse owns the hardware: the app
+  // shows a static color on every device category and releases the SDK afterwards, and Synapse goes back
+  // to the user's own lighting. Nothing is written to a device. NOT VERIFIED: no Razer hardware was
+  // available.
+  //
+  // "match" is required of every profile but unused here: no HID driver is named "razer-chroma".
+  "id": "razer-chroma",
+  "name": "Razer Chroma (Synapse)",
+  "driver": "razer-chroma",
+  "match": { "vendorId": "0x1532" },
+  // Razer deprecates its breathing effect: breathing steps show steady.
+  "effects": { "solid": 0, "breathing": 1 },
+  "minStepMs": 100
+}

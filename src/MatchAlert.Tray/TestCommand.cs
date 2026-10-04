@@ -75,7 +75,9 @@ internal static class TestCommand
         // G HUB keeps the lighting itself and its SDK cannot read it back, so there is nothing to compare:
         // this checks that the SDK connects, shows the pattern and hands the lighting back without an error.
         // OpenRGB is checked by the same play-and-hand-back; its own state is what gets restored.
-        foreach (var device in Program.GHub(() => settings, log).Discover().Concat(new OpenRgbSource(() => settings, log.Write).Discover()))
+        foreach (var device in Program.GHub(() => settings, log).Discover()
+                     .Concat(Program.Chroma(() => settings, log).Discover())
+                     .Concat(new OpenRgbSource(() => settings, log.Write).Discover()))
         {
             try
             {
