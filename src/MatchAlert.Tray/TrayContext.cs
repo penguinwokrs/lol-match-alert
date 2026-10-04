@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright (C) 2026 penguinwokrs
 
+using System.Windows.Forms;
 using System.Diagnostics;
 using MatchAlert.App;
 using MatchAlert.Devices;
@@ -53,6 +54,7 @@ internal sealed class TrayContext : ApplicationContext
             _settingsError,
             new ToolStripSeparator(),
             _keyboards,
+            new ToolStripMenuItem(Strings.Menu_EditPatterns, null, (_, _) => OpenEditor()),
             new ToolStripMenuItem(Strings.Menu_Test, null, (_, _) => TestLighting()),
             new ToolStripMenuItem(Strings.Menu_Setup, null, (_, _) => _ = SetUpKeyboardAsync()),
             new ToolStripMenuItem(Strings.Menu_OpenSettings, null, (_, _) => OpenSettingsFolder()),
@@ -117,6 +119,24 @@ internal sealed class TrayContext : ApplicationContext
             _keyboards.DropDownItems.Add(item);
         }
         if (found.Count == 0) _keyboards.DropDownItems.Add(new ToolStripMenuItem(Strings.Keyboards_None) { Enabled = false });
+    }
+
+    private Editor.PatternEditorWindow? _editor;
+
+    /// <summary>The pattern editor, one at a time: a second request brings the open one forward.</summary>
+    public void OpenEditor()
+    {
+        if (_editor is not null)
+        {
+            _editor.Activate();
+            return;
+        }
+        _editor = new Editor.PatternEditorWindow(_alerts, _devices, _settings, _log);
+        // A WPF window on the tray's WinForms message loop needs this to get its keyboard input.
+        System.Windows.Forms.Integration.ElementHost.EnableModelessKeyboardInterop(_editor);
+        _editor.Closed += (_, _) => _editor = null;
+        _editor.Show();
+        _editor.Activate();
     }
 
     private void TestLighting()

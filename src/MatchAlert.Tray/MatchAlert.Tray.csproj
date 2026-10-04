@@ -1,9 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <NeutralResourcesLanguage>en</NeutralResourcesLanguage>
     <TargetFramework>net10.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
+    <!-- The pattern editor window; the tray itself stays WinForms. -->
+    <UseWPF>true</UseWPF>
     <!-- Lets the desktop project build from WSL and on the Linux CI runner. -->
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <AssemblyName>lol-match-alert</AssemblyName>
@@ -22,20 +23,16 @@
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
   <ItemGroup>
+    <!-- WinForms (the tray) and WPF (the editor) share type names: Pen, Cursors, MouseEventArgs. Each file
+         says which it uses instead of both arriving implicitly. -->
+    <Using Remove="System.Drawing" />
+    <Using Remove="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\MatchAlert.Domain\MatchAlert.Domain.csproj" />
     <ProjectReference Include="..\MatchAlert.App\MatchAlert.App.csproj" />
     <ProjectReference Include="..\MatchAlert.Lcu\MatchAlert.Lcu.csproj" />
     <ProjectReference Include="..\MatchAlert.Devices\MatchAlert.Devices.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <!-- MSBuild's own generator (not the Visual Studio designer), so the class regenerates on a plain
-         `dotnet build` from WSL or the Linux CI runner. English is the neutral culture: a language
-         with no translation gets English. -->
-    <EmbeddedResource Update="Resources\Strings.resx"
-                      StronglyTypedClassName="Strings"
-                      StronglyTypedNamespace="MatchAlert.Tray.Resources"
-                      StronglyTypedFileName="$(IntermediateOutputPath)Strings.g.cs"
-                      StronglyTypedLanguage="CSharp"
-                      Generator="" />
+    <ProjectReference Include="..\MatchAlert.Resources\MatchAlert.Resources.csproj" />
   </ItemGroup>
 </Project>

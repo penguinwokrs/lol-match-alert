@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright (C) 2026 penguinwokrs
 
+using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using MatchAlert.App;
 using MatchAlert.Devices;
@@ -26,6 +27,8 @@ internal static class Program
             if (!Console.IsOutputRedirected) AttachConsole(-1);   // a GUI exe has no console of its own
             return TestCommand.Run(args, new FileLog(AppPaths.LogFile, Console.Out));
         }
+
+        if (args.Contains("--render-editor", StringComparer.OrdinalIgnoreCase)) return RenderEditor(args);
 
         using var single = new Mutex(true, @"Local\lol-match-alert", out bool first);
         if (!first) return 0;
@@ -53,6 +56,7 @@ internal static class Program
         alerts.StatusChanged += s => log.Write($"Status: {s}");
 
         using var tray = new TrayContext(alerts, devices, hid, settings, log);
+        if (args.Contains("--edit-patterns", StringComparer.OrdinalIgnoreCase)) tray.OpenEditor();
         Application.Run(tray);
         log.Write("Exited");
         return 0;
@@ -71,6 +75,33 @@ internal static class Program
         var pulsar = new PulsarDriver(bus, pending, log.Write);
         var sayo = new SayoDriver(bus, pending, log.Write);
         return (new HidDeviceSource(bus, [pulsar, sayo, via], settings, pending, log.Write), via);
+    }
+
+    /// <summary>
+    /// <c>--render-editor &lt;png&gt; [en|ja] [pattern]</c>: draws the pattern editor into an image without showing it, for
+    /// checking its layout. Nothing appears on screen, nothing takes focus and no keyboard lights up, so it
+    /// is safe to run while someone is playing.
+    /// </summary>
+    private static int RenderEditor(string[] args)
+    {
+        int at = Array.FindIndex(args, a => a.Equals("--render-editor", StringComparison.OrdinalIgnoreCase));
+        string output = args.ElementAtOrDefault(at + 1) ?? "editor.png";
+        if (args.ElementAtOrDefault(at + 2) is { } language)
+        {
+            var culture = System.Globalization.CultureInfo.GetCultureInfo(language);
+            System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = culture;
+            System.Globalization.CultureInfo.CurrentUICulture = culture;
+        }
+        var log = new FileLog(AppPaths.LogFile);
+        using var settings = new SettingsService(log);
+        var (hid, _) = Devices(settings, log);
+        var devices = new DeviceSources([hid, GHub(() => settings.Current, log), Chroma(() => settings.Current, log)], log.Write);
+        var alerts = new AlertService(new LcuGameEvents(() => null, log.Write), devices, () => settings.Current, TimeProvider.System, log.Write);
+        var window = new Editor.PatternEditorWindow(alerts, devices, settings, log);
+        if (args.ElementAtOrDefault(at + 3) is { } pattern) window.ShowPattern(pattern);
+        window.RenderTo(output);
+        window.Close();
+        return 0;
     }
 
     /// <summary>

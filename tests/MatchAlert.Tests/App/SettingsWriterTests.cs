@@ -120,3 +120,18 @@ public class SettingsWriterTests : IDisposable
         Assert.NotNull(JsonNode.Parse(File.ReadAllText(File_)));
     }
 }
+
+public class SettingsAsWrittenTests
+{
+    [Fact]
+    public void Reports_the_default_and_device_choices_as_written()
+    {
+        var s = SettingsLoader.Load(SettingsSources.BuiltIn() with
+        {
+            UserSettings = new SourceText("settings.json", """{ "pattern": "pulse", "devices": { "keychron-q1-he-8k": { "enabled": false } } }"""),
+        });
+        Assert.Equal("pulse", s.UserDefaultPattern);
+        Assert.Equal(new DeviceChoice(null, false), s.UserDeviceChoices["keychron-q1-he-8k"]);
+        Assert.Null(SettingsLoader.Load(SettingsSources.BuiltIn()).UserDefaultPattern);
+    }
+}

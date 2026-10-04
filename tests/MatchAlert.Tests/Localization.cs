@@ -21,7 +21,7 @@ internal static class EnglishForTests
 
 public partial class TranslationTests
 {
-    public static TheoryData<string> Projects => new() { "MatchAlert.Tray", "MatchAlert.Devices" };
+    public static TheoryData<string> Projects => new() { "MatchAlert.Resources", "MatchAlert.Devices" };
 
     [Theory]
     [MemberData(nameof(Projects))]
@@ -60,7 +60,7 @@ public partial class TranslationTests
     {
         foreach (var file in new[] { "Strings.resx", "Strings.ja.resx" })
         {
-            var template = Read("MatchAlert.Tray", file)["SettingsTemplate"];
+            var template = Read("MatchAlert.Resources", file)["SettingsTemplate"];
             var settings = MatchAlert.App.SettingsLoader.Load(MatchAlert.App.SettingsSources.BuiltIn() with
             {
                 UserSettings = new MatchAlert.App.SourceText(file, template),
@@ -73,7 +73,7 @@ public partial class TranslationTests
     {
         var dir = AppContext.BaseDirectory;
         while (!File.Exists(Path.Combine(dir, "MatchAlert.sln"))) dir = Path.GetDirectoryName(dir)!;
-        return XDocument.Load(Path.Combine(dir, "src", project, "Resources", file)).Root!.Elements("data")
+        return XDocument.Load(Path.Combine(dir, "src", project, project == "MatchAlert.Resources" ? "" : "Resources", file)).Root!.Elements("data")
             .ToDictionary(d => (string)d.Attribute("name")!, d => (string)d.Element("value")!);
     }
 

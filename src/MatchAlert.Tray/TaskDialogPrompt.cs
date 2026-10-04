@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright (C) 2026 penguinwokrs
 
+using System.Windows.Forms;
 using MatchAlert.Devices.Setup;
 using MatchAlert.Tray.Resources;
 
