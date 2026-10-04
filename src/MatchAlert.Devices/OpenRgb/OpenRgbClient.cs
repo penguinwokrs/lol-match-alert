@@ -30,7 +30,9 @@ public sealed class OpenRgbClient : IDisposable
         var tcp = new TcpClient { NoDelay = true };
         try
         {
-            if (!tcp.ConnectAsync(host, port).Wait(timeout)) throw new IOException($"OpenRGB did not answer on {host}:{port}");
+            // Windows retries a refused loopback connect for about two seconds, so "nothing listening" often
+            // arrives as this timeout rather than a refusal; both mean the same thing to the person reading it.
+            if (!tcp.ConnectAsync(host, port).Wait(timeout)) throw new SocketException((int)SocketError.TimedOut);
             var client = new OpenRgbClient(tcp, timeout);
             client.Send(0, OpenRgbProtocol.SetClientName, Encoding.UTF8.GetBytes(clientName + "\0"));
             client.Send(0, OpenRgbProtocol.RequestProtocolVersion, OpenRgbProtocol.U32(OpenRgbProtocol.ClientVersion));
