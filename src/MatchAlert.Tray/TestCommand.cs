@@ -71,6 +71,30 @@ internal static class TestCommand
             log.Write($"{profile.Name}: {(same ? "restored" : "NOT restored")}");
             if (!same) failures++;
         }
+        // G HUB keeps the lighting itself and the SDK cannot read it back, so there is nothing to compare:
+        // this checks that the SDK connects, shows the pattern and hands the lighting back without an error.
+        foreach (var device in Program.GHub(() => settings, log).Discover())
+        {
+            try
+            {
+                using (var session = device.OpenSession())
+                {
+                    var steps = settings.PatternFor(settings.Profiles.Single(p => p.Id == device.Id)).Steps;
+                    var clock = Stopwatch.StartNew();
+                    for (int i = 0; clock.Elapsed < TimeSpan.FromSeconds(seconds); i++)
+                    {
+                        session.Show(steps[i % steps.Count]);
+                        Thread.Sleep(Math.Max(steps[i % steps.Count].DurationMs, device.MinStepMs));
+                        if (steps.Count == 1) { Thread.Sleep(TimeSpan.FromSeconds(seconds)); break; }
+                    }
+                }
+                log.Write($"{device.Name}: played and handed the lighting back to G HUB (it cannot be read back to compare)");
+            }
+            catch (IOException e)
+            {
+                log.Write($"{device.Name}: skipped: {e.Message}");
+            }
+        }
         return failures == 0 ? 0 : 1;
     }
 }

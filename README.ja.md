@@ -53,11 +53,24 @@ Accept 画面が出た瞬間から、Accept / Decline / 時間切れまで点滅
 | Pulsar | 同じファームウェアのその他の機種 | 未検証、光らない可能性あり | セットアップウィザード（質問なし） |
 | Pulsar | Xboard QS（VIA 用ファームウェア） | 未検証 | セットアップウィザード |
 | Pulsar | PCMK TKL（初代） | 未対応 | |
+| Logicool G（Logitech G） | G HUB で光らせている全機器（キーボード、マウス、ヘッドセット、スピーカー） | 未検証 | G HUB 経由（下記） |
 | 全メーカー | QMK ファームウェアで VIA に対応したキーボード | 未検証 | セットアップウィザード |
-| Razer、Logitech G、Corsair、SteelSeries、Wooting など | メーカー独自のソフトでしか設定できないキーボード | 未対応 | |
+| Razer、Corsair、SteelSeries、Wooting など | メーカー独自のソフトでしか設定できないキーボード | 未対応 | |
 
 - **セットアップウィザード**は、トレイメニューの「キーボードを設定…」です。分かることは自動で調べ、VIA キーボードではどのエフェクトが点灯・明滅に見えるかを聞きます。VIA キーボードは、キーごとのライトが VIA の標準の照明チャネルにあれば動きます。ウィザードは最初にそれを確認し（速度の値を 1 回書いてすぐ元に戻します）、違えばそう表示します。
 - **未対応**は、まだドライバがないという意味です。プロトコルはメーカーごとにドライバ 1 つで対応できます（[README（英語）](README.md#adding-another-makers-protocol)を参照）。ウィザードの「詳細をコピー」の内容を添えて [Issue](https://github.com/penguinwokrs/lol-match-alert/issues/new?template=keyboard-support.yml) を作るところから始められます。
+
+### Logicool G
+
+Logicool G の機器は、直接ではなく **G HUB** を通して、Logicool 公式の LED SDK で光らせます。主導権は G HUB にあり、このアプリは「今の照明を覚えて」「パターンを表示して」「照明を戻して」と G HUB に頼むだけです。
+機器のメモリには何も書き込みません。アプリを閉じれば、G HUB がそのまま照明を引き継ぎます。
+
+- G HUB がインストールされ、起動している必要があります。ない場合は Logicool の機器は一覧に出ず、何も起きません。
+- G HUB が光らせている Logicool G の機器はすべて対象です。`"devices": { "logitech-g-hub": { "enabled": false } }` で対象から外したり、`"pattern"` で別のパターンにしたりできます。
+- 光らない場合は、G HUB でゲームやアプリによる照明の制御が許可されているか確認してください。
+- Logicool の実機ではまだ試していません。`--test` は G HUB 経由でパターンを再生し、G HUB が受け付けたかを表示します。ただし G HUB は今の照明を返さないため、前後の比較はできません。
+
+Logicool のファイルはこのアプリに含まれていません。G HUB がインストールした SDK をそのまま使います。
 
 ### Pulsar のキーボード
 

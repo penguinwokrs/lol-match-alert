@@ -1,0 +1,15 @@
+{
+  // Every Logitech G device G HUB lights, through Logitech's own LED SDK - not over HID. G HUB owns the
+  // hardware: this app asks it to save the lighting, shows the pattern, and asks it to restore. Nothing is
+  // written to a device's memory. NOT VERIFIED: no Logitech hardware was available.
+  //
+  // "match" is required of every profile but unused here: no HID driver is named "logitech-ghub", so this
+  // profile is only ever read by the G HUB integration.
+  "id": "logitech-g-hub",
+  "name": "Logitech G (G HUB)",
+  "driver": "logitech-ghub",
+  "match": { "vendorId": "0x046D" },
+  // Not effect numbers: the integration maps "solid" to a set color and "breathing" to G HUB's pulse.
+  "effects": { "solid": 0, "breathing": 1 },
+  "minStepMs": 100
+}
