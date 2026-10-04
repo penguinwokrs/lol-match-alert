@@ -119,6 +119,7 @@ public static class SettingsLoader
         };
         if (profile.DefaultPattern is { } dp) root["defaultPattern"] = dp;
         if (!profile.EnabledByDefault) root["enabledByDefault"] = false;
+        if (profile.Verified) root["verified"] = true;
         foreach (var (key, value) in profile.Options) root[key] = JsonNode.Parse(value.GetRawText());
 
         return root.ToJsonString(new JsonSerializerOptions { WriteIndented = true }) + Environment.NewLine;
@@ -201,6 +202,7 @@ public static class SettingsLoader
             MinStepMs = dto.MinStepMs ?? DefaultMinStepMs,
             DefaultPattern = dto.DefaultPattern,
             EnabledByDefault = dto.EnabledByDefault ?? true,
+            Verified = dto.Verified ?? false,
             Options = dto.Options ?? [],
             Source = source,
         };
@@ -264,6 +266,7 @@ public static class SettingsLoader
         public int? MinStepMs { get; set; }
         public string? DefaultPattern { get; set; }
         public bool? EnabledByDefault { get; set; }
+        public bool? Verified { get; set; }
 
         /// <summary>Anything else is a driver's own block, such as "via".</summary>
         [JsonExtensionData]

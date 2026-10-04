@@ -4,6 +4,7 @@
   // left out on purpose.
   "id": "keychron-q1-he-8k",
   "name": "Keychron Q1 HE 8K",
+  "verified": true,
   "driver": "via",
   "match": { "vendorId": "0x3434", "productIds": [ "0x1010", "0x1011", "0x1012" ], "productString": "Q1 HE" },
   "effects": { "solid": 1, "breathing": 2 },
