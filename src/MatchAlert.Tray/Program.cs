@@ -7,6 +7,7 @@ using MatchAlert.Devices;
 using MatchAlert.Devices.Hid;
 using MatchAlert.Devices.Logitech;
 using MatchAlert.Devices.OpenRgb;
+using MatchAlert.Devices.Razer;
 using MatchAlert.Devices.Pulsar;
 using MatchAlert.Devices.Sayo;
 using MatchAlert.Devices.Via;
@@ -40,7 +41,9 @@ internal static class Program
         using var settings = new SettingsService(log);
         var (hid, _) = Devices(settings, log);
         // Keyboards driven directly, and devices reached through their maker's own software.
-        var devices = new DeviceSources([hid, GHub(() => settings.Current, log), new OpenRgbSource(() => settings.Current, log.Write)], log.Write);
+        var devices = new DeviceSources(
+            [hid, GHub(() => settings.Current, log), Chroma(() => settings.Current, log), new OpenRgbSource(() => settings.Current, log.Write)],
+            log.Write);
         try { devices.RecoverInterruptedSessions(); }
         catch (Exception e) { log.Write($"Recovery failed: {e.Message}"); }
 
@@ -95,6 +98,19 @@ internal static class Program
         {
             var sdk = GHubLogiLed.TryLoad(out var reason);
             if (reason != lastReason) log.Write($"Logitech G HUB: {reason}");   // once per change, not per alert
+            lastReason = reason;
+            return sdk;
+        }, settings, log.Write);
+    }
+
+    /// <summary>Razer through Synapse's Chroma SDK, loaded fresh per alert like G HUB.</summary>
+    internal static RazerChromaSource Chroma(Func<ResolvedSettings> settings, FileLog log)
+    {
+        string? lastReason = null;
+        return new RazerChromaSource(() => ChromaNative.FindLibrary() is not null, () =>
+        {
+            var sdk = ChromaNative.TryLoad(out var reason);
+            if (reason != lastReason) log.Write($"Razer Chroma: {reason}");
             lastReason = reason;
             return sdk;
         }, settings, log.Write);

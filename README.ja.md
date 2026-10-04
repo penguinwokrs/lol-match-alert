@@ -56,7 +56,8 @@ Accept 画面が出た瞬間から、Accept / Decline / 時間切れまで点滅
 | Logicool G（Logitech G） | G HUB で光らせている全機器（キーボード、マウス、ヘッドセット、スピーカー） | 未検証 | G HUB 経由（下記） |
 | 全メーカー | QMK ファームウェアで VIA に対応したキーボード | 未検証 | セットアップウィザード |
 | 全メーカー | OpenRGB が対応する全機器（OpenRGB を使っている場合） | 未検証、有効にするまでオフ | OpenRGB 経由（下記） |
-| Razer、Corsair、SteelSeries、Wooting など | メーカー独自のソフトでしか設定できないキーボード | 未対応 | |
+| Razer | Synapse で光らせている Chroma 機器すべて（キーボード、マウス、ヘッドセット、マウスパッド、キーパッド、Chroma Link） | 未検証 | Synapse 経由（下記） |
+| Corsair、SteelSeries、Wooting など | メーカー独自のソフトでしか設定できないキーボード | 未対応 | |
 
 - **セットアップウィザード**は、トレイメニューの「キーボードを設定…」です。分かることは自動で調べ、VIA キーボードではどのエフェクトが点灯・明滅に見えるかを聞きます。VIA キーボードは、キーごとのライトが VIA の標準の照明チャネルにあれば動きます。ウィザードは最初にそれを確認し（速度の値を 1 回書いてすぐ元に戻します）、違えばそう表示します。
 - **未対応**は、まだドライバがないという意味です。プロトコルはメーカーごとにドライバ 1 つで対応できます（[README（英語）](README.md#adding-another-makers-protocol)を参照）。ウィザードの「詳細をコピー」の内容を添えて [Issue](https://github.com/penguinwokrs/lol-match-alert/issues/new?template=keyboard-support.yml) を作るところから始められます。
@@ -72,6 +73,17 @@ Logicool G の機器は、直接ではなく **G HUB** を通して、Logicool �
 - Logicool の実機ではまだ試していません。`--test` は G HUB 経由でパターンを再生し、G HUB が受け付けたかを表示します。ただし G HUB は今の照明を返さないため、前後の比較はできません。
 
 Logicool のファイルはこのアプリに含まれていません。G HUB がインストールした SDK をそのまま使います。
+
+### Razer
+
+Razer の機器は、**Synapse** を通して Razer の Chroma SDK で光らせます。Chroma 機器すべてにパターンの色を表示し、通知が終わると SDK を解放するので、Synapse が自分の照明に戻します。機器には何も書き込みません。
+
+- Synapse がインストールされて起動し、Chroma アプリが許可されている必要があります。ない場合は Razer の機器は一覧に出ません。
+- Razer は SDK の明滅エフェクトを非推奨にしているため、明滅のステップは点灯で表示されます。
+- `"devices": { "razer-chroma": { "enabled": false } }` で対象から外せます。
+- Synapse は動いているが Razer の機器はない PC で、SDK の読み込み・開始・解放が正常に動くことは確認しました。実際の Razer 機器が光る様子はまだ確認していません。
+
+Razer のファイルはこのアプリに含まれていません。Synapse がインストールした SDK をそのまま使います。
 
 ### OpenRGB
 

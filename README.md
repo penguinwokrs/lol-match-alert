@@ -62,7 +62,8 @@ own tools and specifications but not yet tried on one (owners can check in a min
 | Logitech G (Logicool G) | Every device G HUB lights: keyboards, mice, headsets, speakers | Unverified | Through G HUB (below) |
 | Any maker | Keyboards with QMK firmware and VIA support | Unverified | Setup wizard |
 | Any maker | Every device OpenRGB supports, if you run OpenRGB | Unverified, off until switched on | Through OpenRGB (below) |
-| Razer, Corsair, SteelSeries, Wooting and others | Keyboards that only work with the maker's own software | Not supported | |
+| Razer | Every Chroma device Synapse lights: keyboards, mice, headsets, mousepads, keypads, Chroma Link | Unverified | Through Synapse (below) |
+| Corsair, SteelSeries, Wooting and others | Keyboards that only work with the maker's own software | Not supported | |
 
 - **Setup wizard** means tray menu, *Set up a keyboard…*. It detects what it can, and for VIA keyboards
   asks which effects look steady and pulsing. VIA keyboards work when their per-key lighting is on VIA's
@@ -87,6 +88,20 @@ lighting back. Nothing is written to a device's memory, and when the app closes 
   accepted it, but G HUB cannot report its lighting, so there is no before-and-after to compare.
 
 Nothing of Logitech's is included with this app: it uses the copy of the SDK that G HUB installs.
+
+### Razer
+
+Razer devices are lit through **Synapse**, with Razer's Chroma SDK. Every Chroma device shows the pattern's
+color, and when the alert ends the app releases the SDK and Synapse goes back to your own lighting. Nothing
+is written to a device.
+
+- Synapse must be installed and running, with Chroma apps allowed. Without it, nothing Razer appears.
+- Razer marks its SDK's breathing effect as deprecated, so breathing steps show steady.
+- Set `"devices": { "razer-chroma": { "enabled": false } }` to leave Razer devices alone.
+- On a PC with Synapse running but no Razer device, the app has been checked to load the SDK, start it and
+  release it cleanly. It has not been seen lighting a real Razer device yet.
+
+Nothing of Razer's is included: the app uses the SDK library Synapse installs.
 
 ### OpenRGB
 
