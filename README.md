@@ -163,6 +163,25 @@ If the wizard says the keyboard is not supported yet, press **Copy details** and
 
 ## Make it yours
 
+### Pattern editor
+
+Tray menu, **Edit patterns…**. Each pattern is a row of color blocks, each as wide as it lasts:
+
+- drag a block's right edge to change how long it shows, drag a block to move it, **+** to add one;
+- click a block to pick its color on the wheel (or type `#RRGGBB`, or tick **Off**), its brightness,
+  and whether it is steady or breathing;
+- the strip at the top plays the pattern at real speed while you edit;
+- tick **Preview on keyboard** to play it on a real keyboard as you change it. Untick it, or close the
+  window, and your own lighting comes back. A real match always takes over;
+- choose which pattern each keyboard plays, switch keyboards off, and pick the default;
+- notes warn when a keyboard will stretch a step, lacks an effect, or has not been tried on hardware.
+
+Built-in patterns can be changed too, and **Reset to built-in** puts them back. **Save** writes
+`settings.json` and closes the window; **Cancel** closes it without saving. The previous version is kept as `settings.json.bak`, because the editor does not keep
+the file's comments.
+
+### settings.json
+
 Tray menu, **Open settings folder**, then edit `settings.json`. Changes apply the moment you save.
 If something is wrong, the tray says what and where, and keeps using the previous settings.
 

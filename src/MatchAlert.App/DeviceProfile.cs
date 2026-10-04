@@ -26,6 +26,9 @@ public sealed class DeviceProfile
 
     /// <summary>False for integrations that must be asked for, such as OpenRGB: <c>devices.&lt;id&gt;.enabled</c> turns them on.</summary>
     public bool EnabledByDefault { get; init; } = true;
+
+    /// <summary>Tried on the real hardware. Everything else is shown as unverified.</summary>
+    public bool Verified { get; init; }
     public string? DefaultPattern { get; init; }
 
     /// <summary>Driver-specific blocks, such as <c>"via"</c>. Only the named driver reads them.</summary>

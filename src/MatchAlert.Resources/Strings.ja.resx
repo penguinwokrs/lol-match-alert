@@ -128,4 +128,148 @@
 }
 </value>
   </data>
+  <data name="Menu_EditPatterns" xml:space="preserve">
+    <value>パターンを編集…</value>
+  </data>
+  <data name="Editor_Title" xml:space="preserve">
+    <value>光り方のパターン</value>
+  </data>
+  <data name="Editor_Pattern" xml:space="preserve">
+    <value>パターン</value>
+  </data>
+  <data name="Editor_New" xml:space="preserve">
+    <value>新規</value>
+  </data>
+  <data name="Editor_Duplicate" xml:space="preserve">
+    <value>複製</value>
+  </data>
+  <data name="Editor_Rename" xml:space="preserve">
+    <value>名前を変更</value>
+  </data>
+  <data name="Editor_Delete" xml:space="preserve">
+    <value>削除</value>
+  </data>
+  <data name="Editor_Reset" xml:space="preserve">
+    <value>初期状態に戻す</value>
+  </data>
+  <data name="Editor_BuiltIn" xml:space="preserve">
+    <value>{0}（組み込み）</value>
+  </data>
+  <data name="Editor_Modified" xml:space="preserve">
+    <value>{0}（組み込み・変更あり）</value>
+  </data>
+  <data name="Editor_Preview" xml:space="preserve">
+    <value>プレビュー</value>
+  </data>
+  <data name="Editor_Timeline" xml:space="preserve">
+    <value>タイムライン：ステップの右端をドラッグで表示時間、ステップ自体をドラッグで並べ替え、＋で追加</value>
+  </data>
+  <data name="Editor_Hold" xml:space="preserve">
+    <value>通知が終わるまで表示し続けます</value>
+  </data>
+  <data name="Editor_Step" xml:space="preserve">
+    <value>選択中のステップ</value>
+  </data>
+  <data name="Editor_Color" xml:space="preserve">
+    <value>色</value>
+  </data>
+  <data name="Editor_Off" xml:space="preserve">
+    <value>消灯</value>
+  </data>
+  <data name="Editor_Brightness" xml:space="preserve">
+    <value>明るさ</value>
+  </data>
+  <data name="Editor_Effect" xml:space="preserve">
+    <value>エフェクト</value>
+  </data>
+  <data name="Editor_Steady" xml:space="preserve">
+    <value>点灯</value>
+  </data>
+  <data name="Editor_Breathing" xml:space="preserve">
+    <value>明滅</value>
+  </data>
+  <data name="Editor_Speed" xml:space="preserve">
+    <value>速さ</value>
+  </data>
+  <data name="Editor_Duration" xml:space="preserve">
+    <value>表示時間（ミリ秒）</value>
+  </data>
+  <data name="Editor_MoveEarlier" xml:space="preserve">
+    <value>前へ</value>
+  </data>
+  <data name="Editor_MoveLater" xml:space="preserve">
+    <value>後ろへ</value>
+  </data>
+  <data name="Editor_RemoveStep" xml:space="preserve">
+    <value>ステップを削除</value>
+  </data>
+  <data name="Editor_Repeat" xml:space="preserve">
+    <value>繰り返し</value>
+  </data>
+  <data name="Editor_UntilEnd" xml:space="preserve">
+    <value>通知が終わるまで</value>
+  </data>
+  <data name="Editor_Times" xml:space="preserve">
+    <value>回、その後は最後のステップを表示</value>
+  </data>
+  <data name="Editor_Keyboards" xml:space="preserve">
+    <value>キーボード</value>
+  </data>
+  <data name="Editor_UseDefault" xml:space="preserve">
+    <value>既定（{0}）</value>
+  </data>
+  <data name="Editor_DefaultPattern" xml:space="preserve">
+    <value>既定のパターン</value>
+  </data>
+  <data name="Editor_Unverified" xml:space="preserve">
+    <value>未検証</value>
+  </data>
+  <data name="Editor_NoDevices" xml:space="preserve">
+    <value>接続されているキーボードがありません。</value>
+  </data>
+  <data name="Editor_PreviewOnKeyboard" xml:space="preserve">
+    <value>キーボードで確認</value>
+  </data>
+  <data name="Editor_PreviewBusy" xml:space="preserve">
+    <value>マッチの通知中です。終わってからもう一度お試しください。</value>
+  </data>
+  <data name="Editor_PreviewEnded" xml:space="preserve">
+    <value>通知のためにキーボードが使われたので、確認を止めました。</value>
+  </data>
+  <data name="Editor_PreviewFailed" xml:space="preserve">
+    <value>{0} で確認できませんでした: {1}</value>
+  </data>
+  <data name="Editor_Save" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="Editor_SaveFailed" xml:space="preserve">
+    <value>保存できませんでした: {0}</value>
+  </data>
+  <data name="Editor_Unsaved" xml:space="preserve">
+    <value>変更を保存してから閉じますか？</value>
+  </data>
+  <data name="Editor_NamePrompt" xml:space="preserve">
+    <value>パターンの名前</value>
+  </data>
+  <data name="Editor_NameTaken" xml:space="preserve">
+    <value>その名前のパターンはすでにあります。</value>
+  </data>
+  <data name="Editor_Ok" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Editor_Cancel" xml:space="preserve">
+    <value>キャンセル</value>
+  </data>
+  <data name="Note_Stretched" xml:space="preserve">
+    <value>{0}: ステップ {1} はこの機種の最短より短いため、{2} ミリ秒で表示されます。</value>
+  </data>
+  <data name="Note_MissingEffect" xml:space="preserve">
+    <value>{0}: 「{1}」エフェクトがないため、このパターンは使えません。</value>
+  </data>
+  <data name="Note_BreathingSteady" xml:space="preserve">
+    <value>{0}: 明滅のステップは点灯で表示されます。</value>
+  </data>
+  <data name="Note_Unverified" xml:space="preserve">
+    <value>{0} は実機ではまだ確認していません。</value>
+  </data>
 </root>

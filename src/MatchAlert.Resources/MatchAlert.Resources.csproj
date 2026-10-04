@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The tray's strings, in an assembly of their own: the WPF markup compiler builds a temporary copy of
+       the tray project that does not run resx code generation, so a same-assembly Strings class is not
+       there for it to see. Same reason, and same fix, as OpenInzone.Resources. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <NeutralResourcesLanguage>en</NeutralResourcesLanguage>
+    <RootNamespace>MatchAlert.Tray.Resources</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="MatchAlert.Tests" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Strings.resx"
+                      StronglyTypedClassName="Strings"
+                      StronglyTypedNamespace="MatchAlert.Tray.Resources"
+                      StronglyTypedFileName="$(IntermediateOutputPath)Strings.g.cs"
+                      StronglyTypedLanguage="CSharp"
+                      PublicClass="true"
+                      Generator="" />
+  </ItemGroup>
+</Project>

@@ -57,9 +57,15 @@ public sealed class ResolvedSettings
     private readonly IReadOnlySet<string> _disabled;
 
     internal ResolvedSettings(IReadOnlyDictionary<string, Pattern> patterns, IReadOnlyList<DeviceProfile> profiles,
-        IReadOnlyDictionary<string, string> patternByDevice, IReadOnlySet<string> disabled, TimeSpan maxAlert, string language)
+        IReadOnlyDictionary<string, string> patternByDevice, IReadOnlySet<string> disabled, TimeSpan maxAlert, string language,
+        IReadOnlyDictionary<string, Pattern> builtInPatterns, IReadOnlySet<string> userPatterns,
+        string? userDefaultPattern, IReadOnlyDictionary<string, DeviceChoice> userDeviceChoices)
     {
+        UserDefaultPattern = userDefaultPattern;
+        UserDeviceChoices = userDeviceChoices;
         Language = language;
+        BuiltInPatterns = builtInPatterns;
+        UserPatterns = userPatterns;
         Patterns = patterns;
         Profiles = profiles;
         _patternByDevice = patternByDevice;
@@ -68,6 +74,18 @@ public sealed class ResolvedSettings
     }
 
     public IReadOnlyDictionary<string, Pattern> Patterns { get; }
+
+    /// <summary>The patterns that ship with the app, as shipped, whether or not settings.json overrides them.</summary>
+    public IReadOnlyDictionary<string, Pattern> BuiltInPatterns { get; }
+
+    /// <summary>The "pattern" settings.json names, if it names one.</summary>
+    public string? UserDefaultPattern { get; }
+
+    /// <summary>What settings.json says per device, as written: null where it says nothing.</summary>
+    public IReadOnlyDictionary<string, DeviceChoice> UserDeviceChoices { get; }
+
+    /// <summary>Names settings.json defines: the user's own patterns and their overrides of built-in ones.</summary>
+    public IReadOnlySet<string> UserPatterns { get; }
     public IReadOnlyList<DeviceProfile> Profiles { get; }
 
     /// <summary>"auto" (the Windows display language), "en" or "ja". Read once at startup.</summary>
