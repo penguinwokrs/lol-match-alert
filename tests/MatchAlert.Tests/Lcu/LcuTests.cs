@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright (C) 2026 penguinwokrs
 
+using MatchAlert.Domain;
 using MatchAlert.Lcu;
 
 namespace MatchAlert.Tests.Lcu;
@@ -56,5 +57,54 @@ public class LcuFramesTests
     public void Subscribes_to_the_phase_event()
     {
         Assert.Equal("""[5,"OnJsonApiEvent_lol-gameflow_v1_gameflow-phase"]""", LcuFrames.Subscribe);
+    }
+}
+
+public class LcuGameEventsTests
+{
+    [Fact]
+    public async Task A_client_that_refuses_connections_is_retried_not_given_up_on()
+    {
+        // A lockfile whose port nothing listens on: the client is starting up, or has just crashed.
+        var lockfile = Path.GetTempFileName();
+        File.WriteAllText(lockfile, "LeagueClient:1234:1:not-a-real-password:https");
+        var attempts = 0;
+        var events = new LcuGameEvents(() => { Interlocked.Increment(ref attempts); return lockfile; }, _ => { }, TimeSpan.FromMilliseconds(20));
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var states = new System.Collections.Concurrent.ConcurrentQueue<ClientState>();
+
+        var watching = Task.Run(async () => { await foreach (var s in events.WatchAsync(cts.Token)) states.Enqueue(s); });
+        while (Volatile.Read(ref attempts) < 3 && !cts.IsCancellationRequested) await Task.Delay(20);
+
+        Assert.True(attempts >= 3, "kept retrying");
+        Assert.False(watching.IsCompleted);
+        Assert.Equal([ClientState.Disconnected], states);   // said once, not on every retry
+        cts.Cancel();
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => watching);
+        File.Delete(lockfile);
+    }
+
+    [Fact]
+    public async Task A_client_that_accepts_but_never_answers_is_timed_out_and_retried()
+    {
+        // Accepts TCP and then says nothing: a hung client. Without a timeout the connect waits forever.
+        using var silent = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Loopback, 0);
+        silent.Start();
+        var port = ((System.Net.IPEndPoint)silent.LocalEndpoint).Port;
+        var lockfile = Path.GetTempFileName();
+        File.WriteAllText(lockfile, $"LeagueClient:1234:{port}:not-a-real-password:https");
+        var attempts = 0;
+        var events = new LcuGameEvents(() => { Interlocked.Increment(ref attempts); return lockfile; }, _ => { },
+            retryDelay: TimeSpan.FromMilliseconds(20), connectTimeout: TimeSpan.FromMilliseconds(200));
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+
+        var watching = Task.Run(async () => { await foreach (var _ in events.WatchAsync(cts.Token)) { } });
+        while (Volatile.Read(ref attempts) < 3 && !cts.IsCancellationRequested) await Task.Delay(20);
+
+        Assert.True(attempts >= 3, "kept retrying after a connect that never completed");
+        Assert.False(watching.IsCompleted);
+        cts.Cancel();
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => watching);
+        File.Delete(lockfile);
     }
 }

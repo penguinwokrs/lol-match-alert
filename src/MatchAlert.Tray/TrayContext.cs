@@ -67,6 +67,7 @@ internal sealed class TrayContext : ApplicationContext
         ShowSettingsError();
 
         _run = Task.Run(() => _alerts.RunAsync(_stop.Token));
+        _run.ContinueWith(t => _log.Write($"Alerting stopped unexpectedly: {t.Exception}"), TaskContinuationOptions.OnlyOnFaulted);
         OfferSetupIfNothingIsKnown();
     }
 

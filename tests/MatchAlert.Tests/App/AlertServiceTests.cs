@@ -138,6 +138,24 @@ public class AlertServiceTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task A_failed_device_listing_skips_one_alert_and_not_the_rest()
+    {
+        var q1 = new FakeDevice(Q1);
+        var source = new FakeDeviceSource(q1) { FailNext = 1 };
+        var logged = new List<string>();
+        var service = new AlertService(_events, source, () => _settings, _time, m => { lock (logged) logged.Add(m); });
+        _run = Task.Run(() => service.RunAsync(_cts.Token));
+
+        _events.Push("ReadyCheck");
+        await Eventually.True(() => { lock (logged) return logged.Any(l => l.Contains("Could not list")); });
+        _events.Push("Lobby");
+        _events.Push("ReadyCheck");
+
+        await Eventually.True(() => q1.Last?.Shown.Count > 0, "the next match still lights up");
+        Assert.False(_run.IsCompleted);
+    }
+
+    [Fact]
     public async Task Status_follows_the_client()
     {
         var q1 = new FakeDevice(Q1);

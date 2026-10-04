@@ -71,7 +71,16 @@ public sealed class AlertService(
             var cts = new CancellationTokenSource(current.MaxAlert, time);
             var plays = new List<Task>();
 
-            foreach (var device in devices.Discover())
+            IReadOnlyList<ILightingDevice> found;
+            try { found = devices.Discover(); }
+            catch (Exception e)
+            {
+                // This alert is lost; the next one must not be. Never let it end RunAsync.
+                log($"Could not list keyboards: {e.Message}");
+                found = [];
+            }
+
+            foreach (var device in found)
             {
                 var profile = current.Profiles.FirstOrDefault(p => p.Id == device.Id);
                 if (profile is null || !current.IsEnabled(device.Id)) continue;

@@ -49,7 +49,12 @@ internal sealed class FakeDevice(string id, int minStepMs = 0, bool fails = fals
 internal sealed class FakeDeviceSource(params ILightingDevice[] devices) : IDeviceSource
 {
     public int Recovered { get; private set; }
-    public IReadOnlyList<ILightingDevice> Discover() => devices;
+
+    /// <summary>How many of the next Discover calls throw, as a failing HID enumeration would.</summary>
+    public int FailNext { get; set; }
+
+    public IReadOnlyList<ILightingDevice> Discover() =>
+        FailNext-- > 0 ? throw new IOException("Could not list HID devices") : devices;
     public void RecoverInterruptedSessions() => Recovered++;
 }
 
@@ -64,8 +69,11 @@ internal sealed class CountingTimeProvider : Microsoft.Extensions.Time.Testing.F
 
     public override ITimer CreateTimer(TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period)
     {
+        // Counted once registered: counting first would let a test move the clock in between,
+        // and the timer would then be due relative to the later time.
+        var timer = base.CreateTimer(callback, state, dueTime, period);
         Interlocked.Increment(ref _timers);
-        return base.CreateTimer(callback, state, dueTime, period);
+        return timer;
     }
 }
 

@@ -17,10 +17,15 @@ namespace MatchAlert.Lcu;
 /// start and reconnecting whenever it restarts. Only the phase event is subscribed: it fires once
 /// per change, in the same millisecond as the ready check itself (measured 2026-10-04).
 /// </summary>
-public sealed class LcuGameEvents(Func<string?> findLockfile, Action<string> log, TimeSpan? retryDelay = null) : IGameEvents
+public sealed class LcuGameEvents(
+    Func<string?> findLockfile,
+    Action<string> log,
+    TimeSpan? retryDelay = null,
+    TimeSpan? connectTimeout = null) : IGameEvents
 {
     private const string ClientProcess = "LeagueClientUx";
     private readonly TimeSpan _retry = retryDelay ?? TimeSpan.FromSeconds(3);
+    private readonly TimeSpan _connectTimeout = connectTimeout ?? TimeSpan.FromSeconds(10);
 
     /// <summary>The lockfile next to the running client's executable, or null when it is not running.</summary>
     public static string? FindRunningClientLockfile()
@@ -50,13 +55,16 @@ public sealed class LcuGameEvents(Func<string?> findLockfile, Action<string> log
         // A producer task does the connecting so errors can be caught freely around it;
         // an iterator cannot yield from inside a try that has a catch.
         var channel = Channel.CreateUnbounded<ClientState>(new UnboundedChannelOptions { SingleReader = true });
-        var producer = Task.Run(() => ProduceAsync(channel.Writer, cancellationToken), cancellationToken);
+        // Its own token, so a consumer that stops reading early also stops the producer.
+        using var stop = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        var producer = Task.Run(() => ProduceAsync(channel.Writer, stop.Token), stop.Token);
         try
         {
             await foreach (var state in channel.Reader.ReadAllAsync(cancellationToken)) yield return state;
         }
         finally
         {
+            stop.Cancel();
             try { await producer; } catch (OperationCanceledException) { }
         }
     }
@@ -88,9 +96,13 @@ public sealed class LcuGameEvents(Func<string?> findLockfile, Action<string> log
                     await FollowAsync(lockfile, Report, ct);
                     log("League client: connection closed");
                 }
-                catch (Exception e) when (e is WebSocketException or HttpRequestException or IOException or JsonException)
+                catch (Exception e)
                 {
-                    log($"League client: {e.Message}");
+                    // Shutting down: whatever failed on the way out no longer matters.
+                    if (ct.IsCancellationRequested) break;
+                    // Anything else at all: a refused or timed-out connect, a client that died mid
+                    // read. Giving up here would leave the app looking alive and never alerting again.
+                    log($"League client: {e.GetType().Name}: {e.Message}");
                 }
                 Report(ClientState.Disconnected);
                 await Task.Delay(_retry, ct);
@@ -127,12 +139,17 @@ public sealed class LcuGameEvents(Func<string?> findLockfile, Action<string> log
         socket.Options.SetRequestHeader("Authorization", $"Basic {lockfile.BasicAuth}");
         // The client serves a self-signed certificate, and only ever on 127.0.0.1.
         socket.Options.RemoteCertificateValidationCallback = (_, _, _, _) => true;
-        await socket.ConnectAsync(new Uri($"wss://127.0.0.1:{lockfile.Port}/"), ct);
-        await socket.SendAsync(Encoding.UTF8.GetBytes(LcuFrames.Subscribe), WebSocketMessageType.Text, true, ct);
+        using (var connecting = CancellationTokenSource.CreateLinkedTokenSource(ct))
+        {
+            // A client that accepts and then hangs must not hang us with it.
+            connecting.CancelAfter(_connectTimeout);
+            await socket.ConnectAsync(new Uri($"wss://127.0.0.1:{lockfile.Port}/"), connecting.Token);
+            await socket.SendAsync(Encoding.UTF8.GetBytes(LcuFrames.Subscribe), WebSocketMessageType.Text, true, connecting.Token);
 
-        // Subscribing only reports changes. Ask for the current phase too, so starting (or
-        // reconnecting) in the middle of a ready check still alerts.
-        report(new ClientState(true, await GetPhaseAsync(lockfile, ct)));
+            // Subscribing only reports changes. Ask for the current phase too, so starting (or
+            // reconnecting) in the middle of a ready check still alerts.
+            report(new ClientState(true, await GetPhaseAsync(lockfile, connecting.Token)));
+        }
         log($"League client: connected on port {lockfile.Port}");
 
         var buffer = new byte[16 * 1024];
