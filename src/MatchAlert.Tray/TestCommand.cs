@@ -3,7 +3,6 @@
 
 using System.Diagnostics;
 using MatchAlert.App;
-using MatchAlert.Devices.Via;
 using MatchAlert.Domain;
 
 namespace MatchAlert.Tray;
@@ -28,7 +27,7 @@ internal static class TestCommand
             return 3;
         }
 
-        var (source, via) = Program.Devices(() => settings, log);
+        var (source, _) = Program.Devices(() => settings, log);
         source.RecoverInterruptedSessions();
         var found = source.Recognised();
         if (found.Count == 0)
@@ -39,20 +38,16 @@ internal static class TestCommand
         }
 
         int failures = 0;
-        foreach (var (hid, profile) in found.Where(f => f.Profile.Driver == "via"))
+        foreach (var (hid, profile) in found)
         {
-            var options = ViaOptions.From(profile);
-            ViaSnapshot before;
-            using (var kb = via.Open(hid, options))
-            {
-                before = kb.Snapshot();
-                log.Write($"{profile.Name}: VIA protocol {kb.Protocol}, channel {options.Channel}, resetOnEffect {options.ResetOnEffect}");
-            }
+            if (source.DriverFor(profile) is not { } driver) continue;
+            var before = driver.ReadState(hid, profile);
+            log.Write($"{profile.Name}: driver {driver.Id}, {hid}");
             log.Write($"{profile.Name}: before  {before}");
 
             var pattern = settings.PatternFor(profile);
             var writes = new List<double>();
-            using (var session = via.Create(hid, profile).OpenSession())
+            using (var session = driver.Create(hid, profile).OpenSession())
             {
                 var clock = Stopwatch.StartNew();
                 for (int i = 0; clock.Elapsed < TimeSpan.FromSeconds(seconds); i++)
@@ -70,14 +65,9 @@ internal static class TestCommand
                 $"step write ms first {writes[0]:F0}, then min {writes.Skip(1).DefaultIfEmpty().Min():F0} " +
                 $"avg {writes.Skip(1).DefaultIfEmpty().Average():F0} max {writes.Skip(1).DefaultIfEmpty().Max():F0}");
 
-            ViaSnapshot after;
-            using (var kb = via.Open(hid, options)) after = kb.Snapshot();
+            var after = driver.ReadState(hid, profile);
             log.Write($"{profile.Name}: after   {after}");
-
-            // v3 brightness does not round-trip exactly (44 reads back as 42); everything else must.
-            bool same = after.Effect == before.Effect && after.Speed == before.Speed
-                && after.Hue == before.Hue && after.Sat == before.Sat
-                && Math.Abs(after.Brightness - before.Brightness) <= 2;
+            bool same = before.Matches(after);
             log.Write($"{profile.Name}: {(same ? "restored" : "NOT restored")}");
             if (!same) failures++;
         }

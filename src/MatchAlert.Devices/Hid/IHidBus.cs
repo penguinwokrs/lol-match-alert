@@ -3,7 +3,7 @@
 
 namespace MatchAlert.Devices.Hid;
 
-/// <summary>Raw reports to and from one HID collection, without the report id byte.</summary>
+/// <summary>Raw reports to and from one HID collection, without the report id byte. Report length is the device's own (32 bytes for VIA, 64 for Pulsar).</summary>
 public interface IRawHid : IDisposable
 {
     /// <summary>Sends one report. Short payloads are padded with zeros to the report length.</summary>

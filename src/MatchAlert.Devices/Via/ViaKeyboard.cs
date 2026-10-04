@@ -36,7 +36,7 @@ public sealed record ViaTiming(
 /// change lives in RAM and a power cycle brings back the user's own lighting.
 /// </para>
 /// </summary>
-public sealed class ViaKeyboard : IDisposable
+public sealed class ViaKeyboard : IKeyboardLink<ViaSnapshot>
 {
     public const ushort UsagePage = 0xFF60;
     public const ushort Usage = 0x61;
@@ -75,6 +75,12 @@ public sealed class ViaKeyboard : IDisposable
     {
         var color = Get(ViaValue.Color, 2);
         return new ViaSnapshot(Get(ViaValue.Brightness, 1)[0], Get(ViaValue.Effect, 1)[0], Get(ViaValue.Speed, 1)[0], color[0], color[1]);
+    }
+
+    public ShownColor Showing()
+    {
+        var color = Get(ViaValue.Color, 2);
+        return new ShownColor(Get(ViaValue.Effect, 1)[0], color[0], color[1]);
     }
 
     /// <summary>

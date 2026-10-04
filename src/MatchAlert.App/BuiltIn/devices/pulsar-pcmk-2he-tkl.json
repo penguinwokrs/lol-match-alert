@@ -1,0 +1,18 @@
+{
+  // NOT VERIFIED ON HARDWARE. Built from Pulsar's own web configurator (bbb.pulsar.gg, its "nKey" app),
+  // which lists this product id for the PCMK 2HE TKL in every layout.
+  //
+  // Lighting is read with 0x22 and set with 0x23 on the raw HID interface; the configurator's separate
+  // save (0x23 0xFE) is never sent. Whether a 0x23 alone still reaches flash is unknown, so writes are
+  // kept rare: minStepMs holds any pattern to about one step a second, and the default pattern is the
+  // keyboard's own breathing effect, which is one write per alert. Lower minStepMs once an owner has
+  // confirmed that unplugging the keyboard after an alert brings their own lighting back.
+  "id": "pulsar-pcmk-2he-tkl",
+  "name": "Pulsar PCMK 2HE TKL",
+  "driver": "pulsar",
+  "match": { "vendorId": "0x3710", "productIds": [ "0x2402" ] },
+  // QMK rgb_matrix numbering, as the configurator lists them.
+  "effects": { "solid": 1, "breathing": 5 },
+  "minStepMs": 1000,
+  "defaultPattern": "pulse"
+}

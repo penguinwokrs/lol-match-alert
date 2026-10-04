@@ -1,0 +1,14 @@
+{
+  // NOT VERIFIED ON HARDWARE. Built from Pulsar's own web configurator (bbb.pulsar.gg, its "nKey" app),
+  // which lists these product ids as XBOARD MS ANSI (0x2403), JIS (0x2407) and ISO (0x2408).
+  //
+  // Same protocol and the same caution as the PCMK 2HE TKL profile: lighting through 0x22 / 0x23, the
+  // save command never sent, and writes kept rare until an owner confirms they do not persist.
+  "id": "pulsar-xboard-ms",
+  "name": "Pulsar XBOARD MS",
+  "driver": "pulsar",
+  "match": { "vendorId": "0x3710", "productIds": [ "0x2403", "0x2407", "0x2408" ] },
+  "effects": { "solid": 1, "breathing": 5 },
+  "minStepMs": 1000,
+  "defaultPattern": "pulse"
+}

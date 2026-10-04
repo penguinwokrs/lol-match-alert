@@ -1,5 +1,5 @@
-name: Keyboard support
-description: Ask for a keyboard the setup wizard could not set up
+name: Keyboard support or verification
+description: Ask for a keyboard the wizard could not set up, or report how an unverified one behaved
 labels: [keyboard]
 body:
   - type: input
@@ -24,3 +24,14 @@ body:
       options: ["Yes", "No", "Not sure"]
     validations:
       required: true
+  - type: textarea
+    id: test
+    attributes:
+      label: Output of `lol-match-alert.exe --test`
+      description: For a keyboard the app already knows, such as an unverified Pulsar. Run it from the install folder.
+      render: text
+  - type: dropdown
+    id: replug
+    attributes:
+      label: After --test, unplug the keyboard and plug it back in. Which lighting is on it?
+      options: ["My own lighting", "The app's colors", "Something else", "Did not try"]

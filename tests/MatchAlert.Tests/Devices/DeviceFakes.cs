@@ -11,15 +11,23 @@ namespace MatchAlert.Tests.Devices;
 
 internal sealed class FakeHidBus : IHidBus
 {
-    private readonly List<(HidDeviceInfo Info, FakeViaBoard? Board)> _devices = [];
+    private readonly List<(HidDeviceInfo Info, IRawHid? Board)> _devices = [];
 
     public static HidDeviceInfo Via(ushort vid, ushort pid, string product, string? path = null) =>
         new(path ?? $@"\\?\hid#vid_{vid:x4}&pid_{pid:x4}&col05", vid, pid, ViaKeyboard.UsagePage, ViaKeyboard.Usage, 33, 33, product);
 
+    /// <summary>Pulsar boards answer on the raw HID page with 64-byte reports.</summary>
+    public static HidDeviceInfo Pulsar(ushort pid, string product) =>
+        new($@"\\?\hid#vid_3710&pid_{pid:x4}&mi_01", 0x3710, pid, 0xFF60, 0x61, 65, 65, product);
+
+    /// <summary>The same keyboards' bootloader collection, which must never be opened.</summary>
+    public static HidDeviceInfo PulsarBoot(ushort pid) =>
+        new($@"\\?\hid#vid_3710&pid_{pid:x4}&mi_02", 0x3710, pid, 0xFF1C, 0x1C, 65, 65, "PULSAR BOOT");
+
     public static HidDeviceInfo KeyboardCollection(ushort vid, ushort pid, string product) =>
         new($@"\\?\hid#vid_{vid:x4}&pid_{pid:x4}&col01", vid, pid, 0x01, 0x06, 9, 2, product);
 
-    public FakeHidBus Add(HidDeviceInfo info, FakeViaBoard? board = null)
+    public FakeHidBus Add(HidDeviceInfo info, IRawHid? board = null)
     {
         _devices.Add((info, board));
         return this;
@@ -69,13 +77,16 @@ internal sealed class DeviceTestbed : IDisposable
     public PendingSnapshots Pending { get; }
     public List<string> Log { get; } = [];
     public ViaDriver Driver { get; private set; } = null!;
+    public MatchAlert.Devices.Pulsar.PulsarDriver Pulsar { get; private set; } = null!;
     public HidDeviceSource Source { get; private set; } = null!;
 
     /// <summary>A fresh driver and source over the same disk state, as after the app restarts.</summary>
     public void Restart()
     {
         Driver = new ViaDriver(Bus, Pending, Log.Add, ViaKeyboardTests.NoWait);
-        Source = new HidDeviceSource(Bus, [Driver], () => Settings, Pending, Log.Add);
+        Pulsar = new MatchAlert.Devices.Pulsar.PulsarDriver(Bus, Pending, Log.Add, new MatchAlert.Devices.Pulsar.PulsarTiming(1, 1));
+        // Same order as Program.Devices: vendor drivers before VIA.
+        Source = new HidDeviceSource(Bus, [Pulsar, Driver], () => Settings, Pending, Log.Add);
     }
 
     public void Dispose()

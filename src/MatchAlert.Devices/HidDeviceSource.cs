@@ -35,6 +35,10 @@ public sealed class HidDeviceSource(
     public IReadOnlyList<(HidDeviceInfo Hid, DeviceProfile Profile)> Recognised() =>
         Claim(bus.Enumerate()).Select(c => (c.Hid, c.Profile)).ToList();
 
+    /// <summary>The driver a profile names, or null if no such driver is loaded.</summary>
+    public IDeviceDriver? DriverFor(DeviceProfile profile) => drivers.FirstOrDefault(d => d.Id == profile.Driver);
+
+    /// <summary>Drivers are asked in order; the first that can talk to the device runs its setup.</summary>
     public ISetupFlow? SetupFor(HidDeviceInfo device) =>
         drivers.Select(d => d.TrySetup(device)).FirstOrDefault(f => f is not null);
 

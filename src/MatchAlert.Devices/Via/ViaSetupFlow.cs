@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright (C) 2026 penguinwokrs
 
-using System.Text;
 using MatchAlert.App;
 using MatchAlert.Devices.Hid;
 using MatchAlert.Devices.Resources;
@@ -63,7 +62,7 @@ internal sealed class ViaSetupFlow(IHidBus bus, HidDeviceInfo hid, ViaTiming tim
 
             var profile = new DeviceProfile
             {
-                Id = Slug(DeviceName),
+                Id = ProfileIds.Slug(DeviceName),
                 Name = DeviceName,
                 Driver = "via",
                 Match = new DeviceMatch(hid.VendorId, [hid.ProductId], null),
@@ -109,14 +108,4 @@ internal sealed class ViaSetupFlow(IHidBus bus, HidDeviceInfo hid, ViaTiming tim
         string.Format(Strings.Setup_Unsupported, DeviceName, why),
         details: $"{hid}\npath: {hid.Path}");
 
-    internal static string Slug(string name)
-    {
-        var sb = new StringBuilder();
-        foreach (var c in name.ToLowerInvariant())
-        {
-            if (char.IsAsciiLetterOrDigit(c)) sb.Append(c);
-            else if (sb.Length > 0 && sb[^1] != '-') sb.Append('-');
-        }
-        return sb.ToString().Trim('-') is { Length: > 0 } s ? s : "keyboard";
-    }
 }
