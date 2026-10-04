@@ -9,9 +9,10 @@ using MatchAlert.Domain;
 namespace MatchAlert.Devices.Sayo;
 
 /// <summary>
-/// Keyboards running SayoDevice firmware. Pulsar's PCMK 2 HE family is the one known; its product ids are
-/// the ones Pulsar's configurator asks the browser for. No built-in profile: the configurator has no
-/// product-id-to-name table, so a keyboard is set up from its own product name, by reads only.
+/// Keyboards running SayoDevice firmware. Pulsar's PCMK 3 HE series is the one known: its product ids are the
+/// ones Pulsar's configurator asks the browser for, and the configurator's firmware logs name 0x2404 the
+/// PCMK 3 HE 60 and 0x2502 / 0x2504 the PCMK 3 TKL, which have built-in profiles. The rest (0x2506, 0x2507
+/// "XPad Mini", 0xF003) are set up from the device's own product name, by reads only.
 /// </summary>
 public sealed class SayoDriver(IHidBus bus, PendingSnapshots pending, Action<string> log, SayoTiming? timing = null) : IDeviceDriver
 {

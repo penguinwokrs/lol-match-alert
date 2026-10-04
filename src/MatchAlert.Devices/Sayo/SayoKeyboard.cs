@@ -23,7 +23,7 @@ public sealed record SayoSnapshot(byte[] Effect)
 public sealed record SayoTiming(int ReplyTimeoutMs = 250, int FastReplyTimeoutMs = 50);
 
 /// <summary>
-/// Lighting on keyboards with SayoDevice firmware, which is what Pulsar's PCMK 2 HE family runs. NOT
+/// Lighting on keyboards with SayoDevice firmware, which is what Pulsar's PCMK 3 HE series runs. NOT
 /// VERIFIED ON HARDWARE: built from Pulsar's configurator, whose library was run against an emulated
 /// device to capture its packets.
 /// <para>

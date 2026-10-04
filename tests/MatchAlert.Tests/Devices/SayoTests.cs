@@ -66,7 +66,7 @@ public class SayoFrameTests
 
 public class SayoDriverTests
 {
-    private const ushort Pulsar = 0x3710, Pcmk2He = 0x2404;
+    private const ushort Pulsar = 0x3710, Pcmk3He60 = 0x2404, Unnamed = 0x2506;
     private static readonly Step Red = new(Rgb.Parse("#FF0000"), 100, "solid", null, 300);
     private static readonly Step White = new(Rgb.Parse("#FFFFFF"), 100, "solid", null, 300);
 
@@ -74,8 +74,8 @@ public class SayoDriverTests
     {
         board ??= new FakeSayoBoard();
         var bus = new FakeHidBus()
-            .Add(FakeHidBus.KeyboardCollection(Pulsar, Pcmk2He, "PCMK 2 HE"))
-            .Add(FakeHidBus.Sayo(Pulsar, Pcmk2He, "PCMK 2 HE"), board);
+            .Add(FakeHidBus.KeyboardCollection(Pulsar, Unnamed, "Pulsar Something"))
+            .Add(FakeHidBus.Sayo(Pulsar, Unnamed, "Pulsar Something"), board);
         var bed = new DeviceTestbed(bus);
         var profile = bed.Source.SetupFor(Assert.Single(bed.Source.Unrecognised()))!.Run(new ScriptedPrompt())!;
         return (new DeviceTestbed(bus, new SourceText("p.json", SettingsLoader.Serialize(profile))), board);
@@ -88,7 +88,7 @@ public class SayoDriverTests
         using var _ = bed;
         var (_, profile) = Assert.Single(bed.Source.Recognised());
 
-        Assert.Equal(("pcmk-2-he", "PCMK 2 HE", "sayo"), (profile.Id, profile.Name, profile.Driver));
+        Assert.Equal(("pulsar-something", "Pulsar Something", "sayo"), (profile.Id, profile.Name, profile.Driver));
         Assert.Equal((0x50, 0x30, 1000), (profile.Effects["solid"], profile.Effects["breathing"], profile.MinStepMs));
         Assert.Equal(0, board.Writes);
     }
@@ -158,6 +158,24 @@ public class SayoDriverTests
         bed.Source.RecoverInterruptedSessions();
 
         Assert.Equal(before, board.Effect);
+    }
+
+    [Theory]
+    [InlineData((ushort)0x2404, "pulsar-pcmk-3-he-60")]
+    [InlineData((ushort)0x2502, "pulsar-pcmk-3-he-tkl")]
+    [InlineData((ushort)0x2504, "pulsar-pcmk-3-he-tkl")]
+    public void The_pcmk_3_he_series_is_recognised_without_setup(ushort pid, string id)
+    {
+        var board = new FakeSayoBoard();
+        using var bed = new DeviceTestbed(new FakeHidBus().Add(FakeHidBus.Sayo(Pulsar, pid, "PCMK 3 HE"), board));
+        var (_, profile) = Assert.Single(bed.Source.Recognised());
+        Assert.Equal((id, "sayo"), (profile.Id, profile.Driver));
+        Assert.Empty(bed.Source.Unrecognised());
+
+        var before = board.Effect.ToArray();
+        using (var s = bed.Source.Discover()[0].OpenSession()) s.Show(bed.Settings.PatternFor(profile).Steps[0]);
+        Assert.Equal(before, board.Effect);
+        Assert.All(board.Packets, p => Assert.Equal(0x26, p.Payload[5]));
     }
 
     [Fact]

@@ -55,7 +55,8 @@ own tools and specifications but not yet tried on one (owners can check in a min
 | Keychron | Other models with QMK firmware (those that work with VIA or Keychron Launcher) | Unverified | Setup wizard |
 | Keychron | Models without QMK firmware | Not supported | |
 | Pulsar | PCMK 2HE TKL, XBOARD MS | Unverified | Built in |
-| Pulsar | PCMK 2 HE family (SayoDevice firmware) | Unverified, may not light at all | Setup wizard, no questions |
+| Pulsar | PCMK 3 HE 60, PCMK 3 HE TKL (SayoDevice firmware) | Unverified, may not light at all | Built in |
+| Pulsar | Other models on the same firmware | Unverified, may not light at all | Setup wizard, no questions |
 | Pulsar | Xboard QS with its VIA firmware | Unverified | Setup wizard |
 | Pulsar | PCMK TKL (first generation) | Not supported | |
 | Any maker | Keyboards with QMK firmware and VIA support | Unverified | Setup wizard |
@@ -78,9 +79,9 @@ Bibimbap's own code.
 
 - **PCMK 2HE TKL and XBOARD MS** use a lighting protocol of their own on the raw HID interface. They are
   recognised as soon as they are plugged in.
-- **The PCMK 2 HE family** runs SayoDevice firmware. Bibimbap has no list of their names, so the setup
-  wizard sets one up from the name the keyboard reports, by reading only; there are no questions. One
-  thing is unknown here: Bibimbap always follows a lighting change with a "save all", which this app
+- **The PCMK 3 HE series** (60 and TKL) runs SayoDevice firmware, and is also recognised as soon as it is
+  plugged in. Other Pulsar models on that firmware are set up by the wizard from the name the keyboard
+  reports, by reading only; there are no questions. One thing is unknown here: Bibimbap always follows a lighting change with a "save all", which this app
   never sends. If the firmware only shows lighting once it is saved, the keyboard will simply not light.
   That is safe, but it is the first thing to check.
 

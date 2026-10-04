@@ -40,7 +40,7 @@ public partial class PulsarTests
     public void The_built_in_profiles_keep_writes_rare_until_verified()
     {
         var settings = SettingsLoader.Load(SettingsSources.BuiltIn());
-        foreach (var p in settings.Profiles.Where(p => p.Driver == "pulsar"))
+        foreach (var p in settings.Profiles.Where(p => p.Driver is "pulsar" or "sayo"))
         {
             Assert.True(p.MinStepMs >= 1000, p.Id);
             Assert.Single(settings.PatternFor(p).Steps);   // the firmware's own breathing: one write per alert
