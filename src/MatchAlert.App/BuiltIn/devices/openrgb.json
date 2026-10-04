@@ -1,0 +1,19 @@
+{
+  // Devices OpenRGB drives, through its SDK server, for people who already use OpenRGB. Off until
+  // "devices": { "openrgb": { "enabled": true } } in settings.json: a keyboard driven both by OpenRGB and
+  // by one of this app's own drivers would be fought over.
+  //
+  // "match" is required of every profile but unused here: no HID driver is named "openrgb".
+  "id": "openrgb",
+  "name": "OpenRGB devices",
+  "driver": "openrgb",
+  "match": { "vendorId": "0x0000" },
+  // OpenRGB has no generic breathing: breathing steps show steady.
+  "effects": { "solid": 0, "breathing": 1 },
+  "minStepMs": 100,
+  "enabledByDefault": false,
+  // deviceTypes: any of keyboard, mouse, mousemat, headset, headsetstand, keypad, ledstrip, light,
+  // speaker, gamepad, case, cooler, gpu, dram, motherboard, microphone, accessory, storage, laptop,
+  // monitor, virtual - or "all". Only keyboards by default, so the whole PC does not flash.
+  "openrgb": { "host": "127.0.0.1", "port": 6742, "deviceTypes": [ "keyboard" ] }
+}

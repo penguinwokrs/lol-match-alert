@@ -61,6 +61,7 @@ own tools and specifications but not yet tried on one (owners can check in a min
 | Pulsar | PCMK TKL (first generation) | Not supported | |
 | Logitech G (Logicool G) | Every device G HUB lights: keyboards, mice, headsets, speakers | Unverified | Through G HUB (below) |
 | Any maker | Keyboards with QMK firmware and VIA support | Unverified | Setup wizard |
+| Any maker | Every device OpenRGB supports, if you run OpenRGB | Unverified, off until switched on | Through OpenRGB (below) |
 | Razer, Corsair, SteelSeries, Wooting and others | Keyboards that only work with the maker's own software | Not supported | |
 
 - **Setup wizard** means tray menu, *Set up a keyboard…*. It detects what it can, and for VIA keyboards
@@ -86,6 +87,23 @@ lighting back. Nothing is written to a device's memory, and when the app closes 
   accepted it, but G HUB cannot report its lighting, so there is no before-and-after to compare.
 
 Nothing of Logitech's is included with this app: it uses the copy of the SDK that G HUB installs.
+
+### OpenRGB
+
+If you already use [OpenRGB](https://openrgb.org/), this app can light anything OpenRGB drives, through
+OpenRGB's SDK server. It is off until you switch it on, because a keyboard driven both by OpenRGB and by
+one of this app's own drivers would be fought over.
+
+1. In OpenRGB, open the SDK Server tab and start the server (port 6742).
+2. In `settings.json`, add `"devices": { "openrgb": { "enabled": true } }`.
+3. If OpenRGB also drives a keyboard this app knows itself (a Keychron, say), switch one of them off for it,
+   for example `"keychron-q1-he-8k": { "enabled": false }`.
+
+Only keyboards flash by default, not the whole PC. To include more, copy
+[`openrgb.json`](src/MatchAlert.App/BuiltIn/devices/openrgb.json) into `devices\` and change
+`deviceTypes` (`keyboard`, `mouse`, `headset`, `ledstrip`, … or `"all"`). After the alert, OpenRGB gets
+back the mode and colors it was showing. For most devices that is OpenRGB's own state, since OpenRGB cannot
+read the hardware. OpenRGB has no generic breathing effect, so breathing steps show steady.
 
 ### Pulsar keyboards
 

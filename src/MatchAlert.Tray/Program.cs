@@ -6,6 +6,7 @@ using MatchAlert.App;
 using MatchAlert.Devices;
 using MatchAlert.Devices.Hid;
 using MatchAlert.Devices.Logitech;
+using MatchAlert.Devices.OpenRgb;
 using MatchAlert.Devices.Pulsar;
 using MatchAlert.Devices.Sayo;
 using MatchAlert.Devices.Via;
@@ -39,7 +40,7 @@ internal static class Program
         using var settings = new SettingsService(log);
         var (hid, _) = Devices(settings, log);
         // Keyboards driven directly, and devices reached through their maker's own software.
-        var devices = new DeviceSources([hid, GHub(() => settings.Current, log)], log.Write);
+        var devices = new DeviceSources([hid, GHub(() => settings.Current, log), new OpenRgbSource(() => settings.Current, log.Write)], log.Write);
         try { devices.RecoverInterruptedSessions(); }
         catch (Exception e) { log.Write($"Recovery failed: {e.Message}"); }
 

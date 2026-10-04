@@ -21,5 +21,8 @@ or sponsored by Riot Games. It reads the League client's local, undocumented API
 what the client does. Logitech G devices are lit through Logitech's LED SDK as G HUB installs and registers it; no Logitech
 library or code is included.
 
+Devices driven by OpenRGB (https://openrgb.org/, GPL-2.0-or-later) are reached through OpenRGB's
+documented SDK network protocol, implemented here from its documentation; no OpenRGB code is included.
+
 Keychron, Pulsar, SayoDevice, Logitech and Logicool are trademarks of their owners and are named only to identify hardware;
 this project is not affiliated with any of them.

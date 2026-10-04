@@ -3,6 +3,7 @@
 
 using System.Diagnostics;
 using MatchAlert.App;
+using MatchAlert.Devices.OpenRgb;
 using MatchAlert.Domain;
 
 namespace MatchAlert.Tray;
@@ -71,9 +72,10 @@ internal static class TestCommand
             log.Write($"{profile.Name}: {(same ? "restored" : "NOT restored")}");
             if (!same) failures++;
         }
-        // G HUB keeps the lighting itself and the SDK cannot read it back, so there is nothing to compare:
+        // G HUB keeps the lighting itself and its SDK cannot read it back, so there is nothing to compare:
         // this checks that the SDK connects, shows the pattern and hands the lighting back without an error.
-        foreach (var device in Program.GHub(() => settings, log).Discover())
+        // OpenRGB is checked by the same play-and-hand-back; its own state is what gets restored.
+        foreach (var device in Program.GHub(() => settings, log).Discover().Concat(new OpenRgbSource(() => settings, log.Write).Discover()))
         {
             try
             {
@@ -88,7 +90,7 @@ internal static class TestCommand
                         if (steps.Count == 1) { Thread.Sleep(TimeSpan.FromSeconds(seconds)); break; }
                     }
                 }
-                log.Write($"{device.Name}: played and handed the lighting back to G HUB (it cannot be read back to compare)");
+                log.Write($"{device.Name}: played and handed the lighting back (not read back to compare)");
             }
             catch (IOException e)
             {

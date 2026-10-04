@@ -90,7 +90,11 @@ public static class SettingsLoader
         if (!Languages.Contains(language))
             throw Error(userSource, "language", $"must be one of {string.Join(", ", Languages.Select(l => $"\"{l}\""))}");
 
-        var disabled = (user.Devices ?? []).Where(d => d.Value.Enabled == false).Select(d => d.Key).ToHashSet(StringComparer.Ordinal);
+        var disabled = profiles.Values
+            .Where(p => (user.Devices?.GetValueOrDefault(p.Id)?.Enabled ?? p.EnabledByDefault) == false)
+            .Select(p => p.Id)
+            .Concat((user.Devices ?? []).Where(d => d.Value.Enabled == false).Select(d => d.Key))
+            .ToHashSet(StringComparer.Ordinal);
         return new ResolvedSettings(patterns, profiles.Values.ToList(), patternByDevice, disabled, TimeSpan.FromSeconds(maxSeconds), language);
     }
 
@@ -114,6 +118,7 @@ public static class SettingsLoader
             ["minStepMs"] = profile.MinStepMs,
         };
         if (profile.DefaultPattern is { } dp) root["defaultPattern"] = dp;
+        if (!profile.EnabledByDefault) root["enabledByDefault"] = false;
         foreach (var (key, value) in profile.Options) root[key] = JsonNode.Parse(value.GetRawText());
 
         return root.ToJsonString(new JsonSerializerOptions { WriteIndented = true }) + Environment.NewLine;
@@ -195,6 +200,7 @@ public static class SettingsLoader
             Effects = new Dictionary<string, int>(dto.Effects, StringComparer.Ordinal),
             MinStepMs = dto.MinStepMs ?? DefaultMinStepMs,
             DefaultPattern = dto.DefaultPattern,
+            EnabledByDefault = dto.EnabledByDefault ?? true,
             Options = dto.Options ?? [],
             Source = source,
         };
@@ -257,6 +263,7 @@ public static class SettingsLoader
         public Dictionary<string, int>? Effects { get; set; }
         public int? MinStepMs { get; set; }
         public string? DefaultPattern { get; set; }
+        public bool? EnabledByDefault { get; set; }
 
         /// <summary>Anything else is a driver's own block, such as "via".</summary>
         [JsonExtensionData]

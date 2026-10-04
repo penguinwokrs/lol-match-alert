@@ -23,6 +23,9 @@ public sealed class DeviceProfile
     public required IReadOnlyDictionary<string, int> Effects { get; init; }
 
     public int MinStepMs { get; init; } = SettingsLoader.DefaultMinStepMs;
+
+    /// <summary>False for integrations that must be asked for, such as OpenRGB: <c>devices.&lt;id&gt;.enabled</c> turns them on.</summary>
+    public bool EnabledByDefault { get; init; } = true;
     public string? DefaultPattern { get; init; }
 
     /// <summary>Driver-specific blocks, such as <c>"via"</c>. Only the named driver reads them.</summary>

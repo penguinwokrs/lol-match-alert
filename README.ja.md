@@ -55,6 +55,7 @@ Accept 画面が出た瞬間から、Accept / Decline / 時間切れまで点滅
 | Pulsar | PCMK TKL（初代） | 未対応 | |
 | Logicool G（Logitech G） | G HUB で光らせている全機器（キーボード、マウス、ヘッドセット、スピーカー） | 未検証 | G HUB 経由（下記） |
 | 全メーカー | QMK ファームウェアで VIA に対応したキーボード | 未検証 | セットアップウィザード |
+| 全メーカー | OpenRGB が対応する全機器（OpenRGB を使っている場合） | 未検証、有効にするまでオフ | OpenRGB 経由（下記） |
 | Razer、Corsair、SteelSeries、Wooting など | メーカー独自のソフトでしか設定できないキーボード | 未対応 | |
 
 - **セットアップウィザード**は、トレイメニューの「キーボードを設定…」です。分かることは自動で調べ、VIA キーボードではどのエフェクトが点灯・明滅に見えるかを聞きます。VIA キーボードは、キーごとのライトが VIA の標準の照明チャネルにあれば動きます。ウィザードは最初にそれを確認し（速度の値を 1 回書いてすぐ元に戻します）、違えばそう表示します。
@@ -71,6 +72,18 @@ Logicool G の機器は、直接ではなく **G HUB** を通して、Logicool �
 - Logicool の実機ではまだ試していません。`--test` は G HUB 経由でパターンを再生し、G HUB が受け付けたかを表示します。ただし G HUB は今の照明を返さないため、前後の比較はできません。
 
 Logicool のファイルはこのアプリに含まれていません。G HUB がインストールした SDK をそのまま使います。
+
+### OpenRGB
+
+[OpenRGB](https://openrgb.org/) を使っているなら、OpenRGB の SDK サーバーを通して、OpenRGB が操作できる機器を光らせられます。
+OpenRGB とこのアプリ自身のドライバが同じキーボードを同時に操作すると取り合いになるため、有効にするまではオフです。
+
+1. OpenRGB の「SDK Server」タブでサーバーを起動します（ポート 6742）。
+2. `settings.json` に `"devices": { "openrgb": { "enabled": true } }` を追加します。
+3. このアプリ自身も対応しているキーボード（Keychron など）を OpenRGB でも操作しているなら、どちらかを外します。例: `"keychron-q1-he-8k": { "enabled": false }`
+
+既定ではキーボードだけが光り、PC 全体は光りません。対象を広げるには、[`openrgb.json`](src/MatchAlert.App/BuiltIn/devices/openrgb.json) を `devices\` にコピーして `deviceTypes`（`keyboard`、`mouse`、`headset`、`ledstrip` など、または `"all"`）を変えてください。
+通知の後は、OpenRGB が表示していたモードと色に戻します。多くの機器では OpenRGB がハードウェアの状態を読めないため、これは OpenRGB 自身の状態です。OpenRGB には共通の明滅エフェクトがないので、明滅のステップは点灯で表示されます。
 
 ### Pulsar のキーボード
 
