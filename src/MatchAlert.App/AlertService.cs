@@ -27,6 +27,7 @@ public sealed class AlertService(
     private readonly SemaphoreSlim _gate = new(1, 1);
     private readonly object _statusLock = new();
     private Alert? _alert;
+    private LivePreview? _preview;
     private bool _connected;
 
     public event Action<AlertStatus>? StatusChanged;
@@ -49,6 +50,48 @@ public sealed class AlertService(
         finally
         {
             await StopAsync();
+            if (_preview is { } preview) await StopPreviewAsync(preview);
+        }
+    }
+
+    /// <summary>
+    /// Plays <paramref name="pattern"/> on <paramref name="device"/> until the preview is stopped, for the pattern
+    /// editor. Null while an alert is playing: the match comes first. A match that starts during the preview
+    /// ends it (restoring) and raises <see cref="LivePreview.Ended"/>. Throws if the device cannot be opened.
+    /// </summary>
+    public async Task<LivePreview?> StartPreviewAsync(ILightingDevice device, Pattern pattern)
+    {
+        await _gate.WaitAsync();
+        try
+        {
+            if (_alert is not null) return null;
+            if (_preview is { } running)
+            {
+                _preview = null;
+                await running.EndAsync(takenOver: false);
+            }
+            var profile = settings().Profiles.FirstOrDefault(p => p.Id == device.Id);
+            var session = device.OpenSession();
+            log($"{device.Name}: previewing");
+            return _preview = new LivePreview(this, session, device, profile, pattern, time, log);
+        }
+        finally
+        {
+            _gate.Release();
+        }
+    }
+
+    internal async Task StopPreviewAsync(LivePreview preview)
+    {
+        await _gate.WaitAsync();
+        try
+        {
+            if (_preview == preview) _preview = null;
+            await preview.EndAsync(takenOver: false);
+        }
+        finally
+        {
+            _gate.Release();
         }
     }
 
@@ -67,6 +110,12 @@ public sealed class AlertService(
         try
         {
             if (_alert is not null) return false;
+            if (_preview is { } preview)
+            {
+                // A real alert (or the tray's test) takes the devices: end the preview first, restoring.
+                _preview = null;
+                await preview.EndAsync(takenOver: true);
+            }
             var current = settings();
             var cts = new CancellationTokenSource(current.MaxAlert, time);
             var plays = new List<Task>();
