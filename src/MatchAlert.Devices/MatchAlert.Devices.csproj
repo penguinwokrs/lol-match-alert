@@ -2,6 +2,8 @@
   <PropertyGroup>
     <NeutralResourcesLanguage>en</NeutralResourcesLanguage>
     <TargetFramework>net10.0</TargetFramework>
+    <!-- Function pointers into G HUB's LED SDK. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="MatchAlert.Tests" />

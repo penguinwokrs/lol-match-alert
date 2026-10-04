@@ -59,8 +59,9 @@ own tools and specifications but not yet tried on one (owners can check in a min
 | Pulsar | Other models on the same firmware | Unverified, may not light at all | Setup wizard, no questions |
 | Pulsar | Xboard QS with its VIA firmware | Unverified | Setup wizard |
 | Pulsar | PCMK TKL (first generation) | Not supported | |
+| Logitech G (Logicool G) | Every device G HUB lights: keyboards, mice, headsets, speakers | Unverified | Through G HUB (below) |
 | Any maker | Keyboards with QMK firmware and VIA support | Unverified | Setup wizard |
-| Razer, Logitech G, Corsair, SteelSeries, Wooting and others | Keyboards that only work with the maker's own software | Not supported | |
+| Razer, Corsair, SteelSeries, Wooting and others | Keyboards that only work with the maker's own software | Not supported | |
 
 - **Setup wizard** means tray menu, *Set up a keyboard…*. It detects what it can, and for VIA keyboards
   asks which effects look steady and pulsing. VIA keyboards work when their per-key lighting is on VIA's
@@ -70,6 +71,21 @@ own tools and specifications but not yet tried on one (owners can check in a min
   [Adding another maker's protocol](#adding-another-makers-protocol)), and a
   [keyboard support issue](https://github.com/penguinwokrs/lol-match-alert/issues/new?template=keyboard-support.yml)
   with the wizard's *Copy details* output is the place to start.
+
+### Logitech G
+
+Logitech G devices are lit through **G HUB**, with Logitech's own LED SDK, rather than directly. G HUB
+stays in charge: this app asks it to remember the lighting, shows the pattern, and asks it to put the
+lighting back. Nothing is written to a device's memory, and when the app closes G HUB takes over again.
+
+- G HUB must be installed and running. Without it, nothing Logitech appears and nothing happens.
+- Every Logitech G device G HUB lights joins in. Set `"devices": { "logitech-g-hub": { "enabled": false } }`
+  to leave them alone, or give them their own `"pattern"`.
+- If nothing lights, check that G HUB lets games and apps control the lighting.
+- Not tried on Logitech hardware yet. `--test` plays the pattern through G HUB and says whether G HUB
+  accepted it, but G HUB cannot report its lighting, so there is no before-and-after to compare.
+
+Nothing of Logitech's is included with this app: it uses the copy of the SDK that G HUB installs.
 
 ### Pulsar keyboards
 

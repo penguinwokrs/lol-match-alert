@@ -5,6 +5,7 @@ using System.Diagnostics;
 using MatchAlert.App;
 using MatchAlert.Devices;
 using MatchAlert.Devices.Hid;
+using MatchAlert.Domain;
 using MatchAlert.Tray.Resources;
 
 namespace MatchAlert.Tray;
@@ -15,7 +16,8 @@ internal sealed class TrayContext : ApplicationContext
     private const string Caption = "lol-match-alert";
 
     private readonly AlertService _alerts;
-    private readonly HidDeviceSource _devices;
+    private readonly IDeviceSource _devices;
+    private readonly HidDeviceSource _hid;
     private readonly SettingsService _settings;
     private readonly FileLog _log;
     private readonly CancellationTokenSource _stop = new();
@@ -29,10 +31,11 @@ internal sealed class TrayContext : ApplicationContext
     private bool _setupRunning;
     private bool _stopped;
 
-    public TrayContext(AlertService alerts, HidDeviceSource devices, SettingsService settings, FileLog log)
+    public TrayContext(AlertService alerts, IDeviceSource devices, HidDeviceSource hid, SettingsService settings, FileLog log)
     {
         _alerts = alerts;
         _devices = devices;
+        _hid = hid;
         _settings = settings;
         _log = log;
         _ = _ui.Handle;   // forces a window handle on this (the UI) thread, for BeginInvoke from other threads
@@ -99,9 +102,10 @@ internal sealed class TrayContext : ApplicationContext
     private void FillKeyboards()
     {
         _keyboards.DropDownItems.Clear();
-        var found = Safely(_devices.Recognised, []);
-        foreach (var (_, profile) in found)
+        var found = Safely(_devices.Discover, []);
+        foreach (var device in found)
         {
+            if (_settings.Current.Profiles.FirstOrDefault(p => p.Id == device.Id) is not { } profile) continue;
             var current = _settings.Current;
             var state = current.IsEnabled(profile.Id) ? current.PatternNameFor(profile) : Strings.Keyboards_Off;
             var item = new ToolStripMenuItem($"{profile.Name}  ({state})")
@@ -117,7 +121,7 @@ internal sealed class TrayContext : ApplicationContext
 
     private void TestLighting()
     {
-        if (Safely(_devices.Recognised, []).Count == 0)
+        if (Safely(_devices.Discover, []).Count == 0)
         {
             Inform(Strings.Test_NoKeyboard);
             return;
@@ -134,7 +138,7 @@ internal sealed class TrayContext : ApplicationContext
             return;
         }
 
-        var candidates = Safely(_devices.Unrecognised, []);
+        var candidates = Safely(_hid.Unrecognised, []);
         if (candidates.Count == 0)
         {
             Inform(Strings.Setup_NothingNew);
@@ -144,7 +148,7 @@ internal sealed class TrayContext : ApplicationContext
         var prompt = new TaskDialogPrompt(_ui, Strings.Setup_Caption);
         var target = candidates.Count == 1 ? candidates[0]
             : prompt.Choose(Strings.Setup_WhichDevice, candidates.Select(Describe).ToList()) is int i ? candidates[i] : null;
-        if (target is null || _devices.SetupFor(target) is not { } flow) return;
+        if (target is null || _hid.SetupFor(target) is not { } flow) return;
 
         _setupRunning = true;
         try
@@ -169,7 +173,7 @@ internal sealed class TrayContext : ApplicationContext
 
     private void OfferSetupIfNothingIsKnown()
     {
-        if (Safely(_devices.Recognised, []).Count > 0 || Safely(_devices.Unrecognised, []).Count == 0) return;
+        if (Safely(_hid.Recognised, []).Count > 0 || Safely(_hid.Unrecognised, []).Count == 0) return;
         _icon.BalloonTipClicked += OnBalloon;
         _icon.ShowBalloonTip(10_000, Strings.Balloon_NoKeyboardTitle, Strings.Balloon_NoKeyboardText, ToolTipIcon.Info);
 

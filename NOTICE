@@ -18,5 +18,8 @@ interoperability. No Pulsar or SayoDevice code is included.
 
 League of Legends is a trademark of Riot Games, Inc. This project is not affiliated with, endorsed
 or sponsored by Riot Games. It reads the League client's local, undocumented API and never changes
-what the client does. Keychron, Pulsar and SayoDevice are trademarks of their owners and are named only to identify hardware;
+what the client does. Logitech G devices are lit through Logitech's LED SDK as G HUB installs and registers it; no Logitech
+library or code is included.
+
+Keychron, Pulsar, SayoDevice, Logitech and Logicool are trademarks of their owners and are named only to identify hardware;
 this project is not affiliated with any of them.

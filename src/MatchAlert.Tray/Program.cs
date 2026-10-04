@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using MatchAlert.App;
 using MatchAlert.Devices;
 using MatchAlert.Devices.Hid;
+using MatchAlert.Devices.Logitech;
 using MatchAlert.Devices.Pulsar;
 using MatchAlert.Devices.Sayo;
 using MatchAlert.Devices.Via;
@@ -36,7 +37,9 @@ internal static class Program
         AppDomain.CurrentDomain.UnhandledException += (_, e) => log.Write($"Fatal error: {e.ExceptionObject}");
 
         using var settings = new SettingsService(log);
-        var (devices, _) = Devices(settings, log);
+        var (hid, _) = Devices(settings, log);
+        // Keyboards driven directly, and devices reached through their maker's own software.
+        var devices = new DeviceSources([hid, GHub(() => settings.Current, log)], log.Write);
         try { devices.RecoverInterruptedSessions(); }
         catch (Exception e) { log.Write($"Recovery failed: {e.Message}"); }
 
@@ -45,7 +48,7 @@ internal static class Program
             devices, () => settings.Current, TimeProvider.System, log.Write);
         alerts.StatusChanged += s => log.Write($"Status: {s}");
 
-        using var tray = new TrayContext(alerts, devices, settings, log);
+        using var tray = new TrayContext(alerts, devices, hid, settings, log);
         Application.Run(tray);
         log.Write("Exited");
         return 0;
@@ -81,6 +84,19 @@ internal static class Program
         System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = culture;
         System.Globalization.CultureInfo.CurrentUICulture = culture;
         log.Write($"Language: {language}");
+    }
+
+    /// <summary>Logitech G through G HUB's LED SDK, loaded fresh per alert so starting G HUB later just works.</summary>
+    internal static LogitechGHubSource GHub(Func<ResolvedSettings> settings, FileLog log)
+    {
+        string? lastReason = null;
+        return new LogitechGHubSource(() => GHubLogiLed.FindLibrary() is not null, () =>
+        {
+            var sdk = GHubLogiLed.TryLoad(out var reason);
+            if (reason != lastReason) log.Write($"Logitech G HUB: {reason}");   // once per change, not per alert
+            lastReason = reason;
+            return sdk;
+        }, settings, log.Write);
     }
 
     [DllImport("kernel32.dll")]
