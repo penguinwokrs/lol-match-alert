@@ -45,14 +45,30 @@ so unplugging it always brings back your own settings.
 
 ## Keyboards
 
-| Keyboard | Status |
-|---|---|
-| Keychron Q1 HE 8K | Verified on hardware |
-| Pulsar PCMK 2HE TKL | **Unverified**: built from Pulsar's own configurator, not tested on a board |
-| Pulsar XBOARD MS | **Unverified**: same |
-| Pulsar PCMK 2 HE family (SayoDevice firmware) | **Unverified**: set up by the wizard, may not light at all (see below) |
-| Other Pulsar keyboards on the same protocol | Set up automatically by the wizard, unverified |
-| Other keyboards with VIA support | Set up with the wizard (below) |
+Support by maker. **Verified** means tried on a real keyboard; **unverified** means built from the maker's
+own tools and specifications but not yet tried on one (owners can check in a minute, see
+[Pulsar keyboards](#pulsar-keyboards)). Every keyboard must be connected by USB cable.
+
+| Maker | Models | Support | How |
+|---|---|---|---|
+| Keychron | Q1 HE 8K | **Verified** | Built in |
+| Keychron | Other models with QMK firmware (those that work with VIA or Keychron Launcher) | Unverified | Setup wizard |
+| Keychron | Models without QMK firmware | Not supported | |
+| Pulsar | PCMK 2HE TKL, XBOARD MS | Unverified | Built in |
+| Pulsar | PCMK 2 HE family (SayoDevice firmware) | Unverified, may not light at all | Setup wizard, no questions |
+| Pulsar | Xboard QS with its VIA firmware | Unverified | Setup wizard |
+| Pulsar | PCMK TKL (first generation) | Not supported | |
+| Any maker | Keyboards with QMK firmware and VIA support | Unverified | Setup wizard |
+| Razer, Logitech G, Corsair, SteelSeries, Wooting and others | Keyboards that only work with the maker's own software | Not supported | |
+
+- **Setup wizard** means tray menu, *Set up a keyboard…*. It detects what it can, and for VIA keyboards
+  asks which effects look steady and pulsing. VIA keyboards work when their per-key lighting is on VIA's
+  standard lighting channel; the wizard checks that first, with one speed write it puts straight back,
+  and says so if it is not.
+- **Not supported** means no driver yet. Each maker's protocol is one driver (see
+  [Adding another maker's protocol](#adding-another-makers-protocol)), and a
+  [keyboard support issue](https://github.com/penguinwokrs/lol-match-alert/issues/new?template=keyboard-support.yml)
+  with the wizard's *Copy details* output is the place to start.
 
 ### Pulsar keyboards
 
@@ -68,8 +84,9 @@ Bibimbap's own code.
   never sends. If the firmware only shows lighting once it is saved, the keyboard will simply not light.
   That is safe, but it is the first thing to check.
 
-Nobody has tried either on a real board yet, so the app is careful: it never sends Bibimbap's "save" command, never touches the bootloader, and by default plays the
-keyboard's own breathing effect so it writes to the keyboard only once per alert.
+Nobody has tried either on a real board yet, so the app is careful: it never sends Bibimbap's "save"
+command, never touches the bootloader, and by default plays the keyboard's own breathing effect so it
+writes to the keyboard only once per alert.
 
 **If you own one, you can verify it in a minute** (close Bibimbap first):
 

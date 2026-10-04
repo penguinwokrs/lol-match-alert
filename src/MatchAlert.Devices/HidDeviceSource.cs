@@ -42,9 +42,32 @@ public sealed class HidDeviceSource(
     /// <summary>The driver a profile names, or null if no such driver is loaded.</summary>
     public IDeviceDriver? DriverFor(DeviceProfile profile) => drivers.FirstOrDefault(d => d.Id == profile.Driver);
 
-    /// <summary>Drivers are asked in order; the first that can talk to the device runs its setup.</summary>
+    /// <summary>
+    /// Every driver that volunteers, in order. Vendor drivers come first and probe by reading only, so when a
+    /// keyboard turns out not to speak their protocol the next driver gets it: a Pulsar keyboard on VIA
+    /// firmware reaches the VIA wizard even though the Pulsar driver claims its vendor id.
+    /// </summary>
     public ISetupFlow? SetupFor(HidDeviceInfo device) =>
-        drivers.Select(d => d.TrySetup(device)).FirstOrDefault(f => f is not null);
+        drivers.Select(d => d.TrySetup(device)).OfType<ISetupFlow>().ToList() switch
+        {
+            [] => null,
+            [var only] => only,
+            var several => new FirstThatAnswers(several),
+        };
+
+    private sealed class FirstThatAnswers(IReadOnlyList<ISetupFlow> flows) : ISetupFlow
+    {
+        public string DeviceName => flows[0].DeviceName;
+
+        public DeviceProfile? Run(IUserPrompt prompt)
+        {
+            for (int i = 0; ; i++)
+            {
+                try { return flows[i].Run(prompt); }
+                catch (IOException) when (i < flows.Count - 1) { }   // not this protocol; try the next
+            }
+        }
+    }
 
     public void RecoverInterruptedSessions()
     {

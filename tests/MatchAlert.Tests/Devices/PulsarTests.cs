@@ -155,6 +155,19 @@ public partial class PulsarTests
     }
 
     [Fact]
+    public void A_pulsar_keyboard_on_via_firmware_falls_through_to_the_via_wizard()
+    {
+        var via = new FakeViaBoard();
+        using var bed = new DeviceTestbed(new FakeHidBus().Add(FakeHidBus.Via(0x3710, UnknownPulsar, "Xboard QS"), via));
+        var flow = bed.Source.SetupFor(Assert.Single(bed.Source.Unrecognised()))!;
+
+        var profile = flow.Run(new ScriptedPrompt(0, 1, 0));   // steady, pulsing, save
+
+        Assert.Equal("via", profile!.Driver);
+        Assert.Contains(via.Packets, p => p[0] == 0x24);   // the Pulsar probe was tried first, and only read
+    }
+
+    [Fact]
     public void An_unknown_pulsar_model_is_set_up_by_the_pulsar_driver_without_questions()
     {
         var (bed, board) = Board(UnknownPulsar);

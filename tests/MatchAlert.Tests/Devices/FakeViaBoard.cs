@@ -76,8 +76,11 @@ internal sealed class FakeViaBoard : IRawHid
                 break;
             case 0x09:
                 throw new InvalidOperationException("save (0x09) must never be sent");
+            case 0x0A or 0x0B:
+                throw new InvalidOperationException($"reset or bootloader (0x{p[0]:X2}) must never be sent");
             default:
-                throw new InvalidOperationException($"unexpected command 0x{p[0]:X2}");
+                _responses.Enqueue(Pad([0xFF]));   // QMK answers commands it does not know with id_unhandled
+                break;
         }
     }
 
