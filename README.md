@@ -45,10 +45,62 @@ so unplugging it always brings back your own settings.
 
 ## Keyboards
 
-| Keyboard | Status |
-|---|---|
-| Keychron Q1 HE 8K | Verified on hardware |
-| Other keyboards with VIA support | Set up with the wizard (below) |
+Support by maker. **Verified** means tried on a real keyboard; **unverified** means built from the maker's
+own tools and specifications but not yet tried on one (owners can check in a minute, see
+[Pulsar keyboards](#pulsar-keyboards)). Every keyboard must be connected by USB cable.
+
+| Maker | Models | Support | How |
+|---|---|---|---|
+| Keychron | Q1 HE 8K | **Verified** | Built in |
+| Keychron | Other models with QMK firmware (those that work with VIA or Keychron Launcher) | Unverified | Setup wizard |
+| Keychron | Models without QMK firmware | Not supported | |
+| Pulsar | PCMK 2HE TKL, XBOARD MS | Unverified | Built in |
+| Pulsar | PCMK 3 HE 60, PCMK 3 HE TKL (SayoDevice firmware) | Unverified, may not light at all | Built in |
+| Pulsar | Other models on the same firmware | Unverified, may not light at all | Setup wizard, no questions |
+| Pulsar | Xboard QS with its VIA firmware | Unverified | Setup wizard |
+| Pulsar | PCMK TKL (first generation) | Not supported | |
+| Any maker | Keyboards with QMK firmware and VIA support | Unverified | Setup wizard |
+| Razer, Logitech G, Corsair, SteelSeries, Wooting and others | Keyboards that only work with the maker's own software | Not supported | |
+
+- **Setup wizard** means tray menu, *Set up a keyboard…*. It detects what it can, and for VIA keyboards
+  asks which effects look steady and pulsing. VIA keyboards work when their per-key lighting is on VIA's
+  standard lighting channel; the wizard checks that first, with one speed write it puts straight back,
+  and says so if it is not.
+- **Not supported** means no driver yet. Each maker's protocol is one driver (see
+  [Adding another maker's protocol](#adding-another-makers-protocol)), and a
+  [keyboard support issue](https://github.com/penguinwokrs/lol-match-alert/issues/new?template=keyboard-support.yml)
+  with the wizard's *Copy details* output is the place to start.
+
+### Pulsar keyboards
+
+Pulsar's current keyboards are not VIA keyboards: they are configured with Pulsar's web app,
+Bibimbap, which speaks two different protocols depending on the model. Both are reimplemented here from
+Bibimbap's own code.
+
+- **PCMK 2HE TKL and XBOARD MS** use a lighting protocol of their own on the raw HID interface. They are
+  recognised as soon as they are plugged in.
+- **The PCMK 3 HE series** (60 and TKL) runs SayoDevice firmware, and is also recognised as soon as it is
+  plugged in. Other Pulsar models on that firmware are set up by the wizard from the name the keyboard
+  reports, by reading only; there are no questions. One thing is unknown here: Bibimbap always follows a lighting change with a "save all", which this app
+  never sends. If the firmware only shows lighting once it is saved, the keyboard will simply not light.
+  That is safe, but it is the first thing to check.
+
+Nobody has tried either on a real board yet, so the app is careful: it never sends Bibimbap's "save"
+command, never touches the bootloader, and by default plays the keyboard's own breathing effect so it
+writes to the keyboard only once per alert.
+
+**If you own one, you can verify it in a minute** (close Bibimbap first):
+
+1. In a command prompt, run the line below. It flashes the keyboard and prints its lighting before and
+   after; `restored` at the end means it came back.
+   ```
+   "%LOCALAPPDATA%\Programs\lol-match-alert\lol-match-alert.exe" --test
+   ```
+2. Unplug the keyboard and plug it back in. If your own lighting is there, the app's writes did not stick;
+   if the app's gold is there, they did.
+3. [Open an issue](https://github.com/penguinwokrs/lol-match-alert/issues/new?template=keyboard-support.yml)
+   with what `--test` printed and what you saw after the replug. That is what it takes to mark it verified
+   and allow faster patterns.
 
 ### Setting up a keyboard that is not listed
 

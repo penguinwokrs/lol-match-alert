@@ -23,20 +23,51 @@ public sealed class HidDeviceSource(
     public IReadOnlyList<ILightingDevice> Discover() =>
         Claim(bus.Enumerate()).Select(c => c.Driver.Create(c.Hid, c.Profile)).ToList();
 
-    /// <summary>Collections some driver could talk to but no profile describes: candidates for setup.</summary>
+    /// <summary>
+    /// Collections no profile describes that some driver offers to set up. Asked of the drivers' setup, not
+    /// of IsControlInterface: a driver may drive any profile it is given but only volunteer for its own
+    /// family, so a vendor-defined collection on a mouse or headset is not offered as a keyboard.
+    /// </summary>
     public IReadOnlyList<HidDeviceInfo> Unrecognised()
     {
         var all = bus.Enumerate();
         var claimed = Claim(all).Select(c => c.Hid.Path).ToHashSet(StringComparer.OrdinalIgnoreCase);
-        return all.Where(h => !claimed.Contains(h.Path) && drivers.Any(d => d.IsControlInterface(h))).ToList();
+        return all.Where(h => !claimed.Contains(h.Path) && SetupFor(h) is not null).ToList();
     }
 
     /// <summary>The recognised keyboards that are plugged in, for the tray to list.</summary>
     public IReadOnlyList<(HidDeviceInfo Hid, DeviceProfile Profile)> Recognised() =>
         Claim(bus.Enumerate()).Select(c => (c.Hid, c.Profile)).ToList();
 
+    /// <summary>The driver a profile names, or null if no such driver is loaded.</summary>
+    public IDeviceDriver? DriverFor(DeviceProfile profile) => drivers.FirstOrDefault(d => d.Id == profile.Driver);
+
+    /// <summary>
+    /// Every driver that volunteers, in order. Vendor drivers come first and probe by reading only, so when a
+    /// keyboard turns out not to speak their protocol the next driver gets it: a Pulsar keyboard on VIA
+    /// firmware reaches the VIA wizard even though the Pulsar driver claims its vendor id.
+    /// </summary>
     public ISetupFlow? SetupFor(HidDeviceInfo device) =>
-        drivers.Select(d => d.TrySetup(device)).FirstOrDefault(f => f is not null);
+        drivers.Select(d => d.TrySetup(device)).OfType<ISetupFlow>().ToList() switch
+        {
+            [] => null,
+            [var only] => only,
+            var several => new FirstThatAnswers(several),
+        };
+
+    private sealed class FirstThatAnswers(IReadOnlyList<ISetupFlow> flows) : ISetupFlow
+    {
+        public string DeviceName => flows[0].DeviceName;
+
+        public DeviceProfile? Run(IUserPrompt prompt)
+        {
+            for (int i = 0; ; i++)
+            {
+                try { return flows[i].Run(prompt); }
+                catch (IOException) when (i < flows.Count - 1) { }   // not this protocol; try the next
+            }
+        }
+    }
 
     public void RecoverInterruptedSessions()
     {

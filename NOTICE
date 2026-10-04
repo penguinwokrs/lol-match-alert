@@ -12,6 +12,11 @@ source code is included.
 The SetupAPI and HID declarations are adapted from OpenInzone
 (https://github.com/penguinwokrs/openinzone, GPL-3.0, same author).
 
+The Pulsar lighting protocols (Pulsar's own, and SayoDevice's as Pulsar's keyboards use it) are
+reimplemented from the behaviour of Pulsar's web configurator, Bibimbap (https://bbb.pulsar.gg/), for
+interoperability. No Pulsar or SayoDevice code is included.
+
 League of Legends is a trademark of Riot Games, Inc. This project is not affiliated with, endorsed
 or sponsored by Riot Games. It reads the League client's local, undocumented API and never changes
-what the client does. Keychron is a trademark of its owner and is named only to identify hardware.
+what the client does. Keychron, Pulsar and SayoDevice are trademarks of their owners and are named only to identify hardware;
+this project is not affiliated with any of them.

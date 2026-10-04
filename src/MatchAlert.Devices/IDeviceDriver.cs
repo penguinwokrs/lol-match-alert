@@ -30,4 +30,7 @@ public interface IDeviceDriver
     /// still shows what that session wrote. Anything else means the user has changed it since.
     /// </summary>
     void Recover(HidDeviceInfo device, DeviceProfile profile, PendingEntry entry);
+
+    /// <summary>The lighting as the device reports it, for <c>--test</c> to compare before and after an alert.</summary>
+    DeviceState ReadState(HidDeviceInfo device, DeviceProfile profile);
 }

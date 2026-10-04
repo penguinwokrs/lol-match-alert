@@ -101,10 +101,11 @@ public sealed class WindowsHidBus : IHidBus
     {
         private readonly FileStream _stream = new(handle, FileAccess.ReadWrite, bufferSize: 0, isAsync: true);
 
-        public void Write(ReadOnlySpan<byte> payload)
+        public void Write(ReadOnlySpan<byte> payload, byte reportId = 0)
         {
-            // Report id 0 first: Windows wants it explicitly even when the device has no report ids.
+            // The report id goes first; Windows wants it explicitly even when the device has none (0).
             var report = new byte[outputLength];
+            report[0] = reportId;
             payload[..Math.Min(payload.Length, outputLength - 1)].CopyTo(report.AsSpan(1));
             using var cts = new CancellationTokenSource(1000);
             _stream.WriteAsync(report, cts.Token).AsTask().GetAwaiter().GetResult();

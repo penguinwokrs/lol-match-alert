@@ -5,6 +5,8 @@ using System.Runtime.InteropServices;
 using MatchAlert.App;
 using MatchAlert.Devices;
 using MatchAlert.Devices.Hid;
+using MatchAlert.Devices.Pulsar;
+using MatchAlert.Devices.Sayo;
 using MatchAlert.Devices.Via;
 using MatchAlert.Lcu;
 
@@ -57,8 +59,11 @@ internal static class Program
         var bus = new WindowsHidBus();
         var pending = new PendingSnapshots(AppPaths.PendingDirectory);
         var via = new ViaDriver(bus, pending, log.Write);
-        // Another protocol is one more driver in this list.
-        return (new HidDeviceSource(bus, [via], settings, pending, log.Write), via);
+        // Another protocol is one more driver in this list. Order matters for setup only: the first
+        // driver that can talk to an unknown keyboard sets it up, so vendor-specific drivers go before VIA.
+        var pulsar = new PulsarDriver(bus, pending, log.Write);
+        var sayo = new SayoDriver(bus, pending, log.Write);
+        return (new HidDeviceSource(bus, [pulsar, sayo, via], settings, pending, log.Write), via);
     }
 
     /// <summary>

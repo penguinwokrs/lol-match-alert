@@ -40,4 +40,26 @@ public readonly record struct Rgb(byte R, byte G, byte B)
 }
 
 /// <summary>Hue, saturation and value on the 0-255 scale keyboard firmware uses.</summary>
-public readonly record struct Hsv(byte H, byte S, byte V);
+public readonly record struct Hsv(byte H, byte S, byte V)
+{
+    /// <summary>Back to RGB, for firmware that stores colors that way. The inverse of <see cref="Rgb.ToHsv"/> to within rounding.</summary>
+    public Rgb ToRgb()
+    {
+        if (S == 0) return new Rgb(V, V, V);
+        double h = H * 360.0 / 255 / 60, s = S / 255.0, v = V;
+        int sector = (int)Math.Floor(h) % 6;
+        double f = h - Math.Floor(h);
+        byte p = Round(v * (1 - s)), q = Round(v * (1 - s * f)), t = Round(v * (1 - s * (1 - f))), w = V;
+        return sector switch
+        {
+            0 => new Rgb(w, t, p),
+            1 => new Rgb(q, w, p),
+            2 => new Rgb(p, w, t),
+            3 => new Rgb(p, q, w),
+            4 => new Rgb(t, p, w),
+            _ => new Rgb(w, p, q),
+        };
+
+        static byte Round(double x) => (byte)Math.Round(x, MidpointRounding.AwayFromZero);
+    }
+}

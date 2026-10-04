@@ -45,4 +45,21 @@ public class ColorTests
     {
         Assert.Equal("#FF8000", new Rgb(0xFF, 0x80, 0x00).ToString());
     }
+
+    [Theory]
+    [InlineData("#FF0000")]
+    [InlineData("#00FF00")]
+    [InlineData("#0000FF")]
+    [InlineData("#FFB000")]
+    [InlineData("#FFFFFF")]
+    [InlineData("#0080FF")]
+    [InlineData("#800000")]
+    public void Converts_back_to_rgb_within_rounding(string hex)
+    {
+        var rgb = Rgb.Parse(hex);
+        var back = rgb.ToHsv().ToRgb();
+        Assert.InRange(Math.Abs(back.R - rgb.R), 0, 3);
+        Assert.InRange(Math.Abs(back.G - rgb.G), 0, 3);
+        Assert.InRange(Math.Abs(back.B - rgb.B), 0, 3);
+    }
 }

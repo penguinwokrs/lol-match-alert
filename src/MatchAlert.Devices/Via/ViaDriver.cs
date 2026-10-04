@@ -47,27 +47,38 @@ public sealed class ViaDriver(IHidBus bus, PendingSnapshots pending, Action<stri
     public bool IsControlInterface(HidDeviceInfo device) =>
         device.UsagePage == ViaKeyboard.UsagePage && device.Usage == ViaKeyboard.Usage;
 
-    public ILightingDevice Create(HidDeviceInfo device, DeviceProfile profile) =>
-        new ViaLightingDevice(this, device, profile, ViaOptions.From(profile));
+    public ILightingDevice Create(HidDeviceInfo device, DeviceProfile profile)
+    {
+        var options = ViaOptions.From(profile);
+        var key = RestoringDevice<ViaKeyboard, ViaSnapshot>.KeyFor(Id, profile, device);
+        return new RestoringDevice<ViaKeyboard, ViaSnapshot>(Id, device, profile, pending, log,
+            open: () => Open(device, options),
+            snapshot: kb => CorrectBrightness(key, kb.Snapshot()),
+            afterRestore: (kb, s) => RememberBrightness(key, s.Brightness, kb.Get(ViaValue.Brightness, 1)[0]));
+    }
 
     public ISetupFlow? TrySetup(HidDeviceInfo device) =>
         IsControlInterface(device) ? new ViaSetupFlow(bus, device, _timing) : null;
 
     public void Recover(HidDeviceInfo device, DeviceProfile profile, PendingEntry entry)
     {
-        var saved = entry.State.Deserialize<PendingState>(PendingState.Json)
-            ?? throw new InvalidDataException("empty pending state");
         using var kb = Open(device, ViaOptions.From(profile));
-        var now = kb.Snapshot();
-        if (saved.Shown.Any(s => s.Effect == now.Effect && s.Hue == now.Hue && s.Sat == now.Sat))
-        {
-            kb.Restore(saved.Snapshot);
-            log($"{profile.Name}: restored the lighting an interrupted alert left behind ({saved.Snapshot})");
-        }
-        else
-        {
-            log($"{profile.Name}: an interrupted alert's snapshot was discarded; the lighting has changed since ({now})");
-        }
+        RestoringDevice<ViaKeyboard, ViaSnapshot>.Recover(kb, entry, profile.Name, log);
+    }
+
+    public DeviceState ReadState(HidDeviceInfo device, DeviceProfile profile)
+    {
+        using var kb = Open(device, ViaOptions.From(profile));
+        var s = kb.Snapshot();
+        return new DeviceState(
+        [
+            new("effect", s.Effect),
+            new("speed", s.Speed),
+            // v3 brightness does not round-trip exactly (a Q1 HE reads 44 back as 42).
+            new("brightness", s.Brightness, Tolerance: kb.IsV3 ? 2 : 0),
+            new("hue", s.Hue),
+            new("sat", s.Sat),
+        ]);
     }
 
     /// <summary>Opens the board directly, for diagnostics and setup. Lighting sessions go through <see cref="Create"/>.</summary>
@@ -84,15 +95,4 @@ public sealed class ViaDriver(IHidBus bus, PendingSnapshots pending, Action<stri
             : snapshot;
 
     internal void RememberBrightness(string key, byte written, byte readBack) => _brightnessEchoes[key] = (written, readBack);
-
-    internal PendingSnapshots Pending => pending;
-    internal Action<string> Log => log;
-
-    /// <summary>What goes in a pending file: the lighting to restore, and what we showed instead.</summary>
-    internal sealed record PendingState(ViaSnapshot Snapshot, List<Shown> Shown)
-    {
-        public static readonly JsonSerializerOptions Json = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-    }
-
-    internal sealed record Shown(byte Effect, byte Hue, byte Sat);
 }

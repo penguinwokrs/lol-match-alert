@@ -1,0 +1,18 @@
+{
+  // NOT VERIFIED ON HARDWARE. Pulsar's web configurator (bbb.pulsar.gg, its "sKey" app) names this
+  // product id "PCMK 3 HE 60" (ANSI, ISO and JIS alike) in its firmware logs.
+  //
+  // SayoDevice firmware: the 48-byte LED effect block is read and written with command 0x26 on report
+  // 0x22. The configurator follows every write with 0x0D, "save all", which is never sent here; if the
+  // firmware only shows lighting once saved, the keyboard simply does not light. Writes are kept rare
+  // until an owner confirms what a lone 0x26 does: one step a second at most, and by default the
+  // keyboard's own breathing effect, one write per alert.
+  "id": "pulsar-pcmk-3-he-60",
+  "name": "Pulsar PCMK 3 HE 60",
+  "driver": "sayo",
+  "match": { "vendorId": "0x3710", "productIds": [ "0x2404" ] },
+  // mode * 16 + sub-mode: Basic / Solid Color, Breath / Breathing.
+  "effects": { "solid": 80, "breathing": 48 },
+  "minStepMs": 1000,
+  "defaultPattern": "pulse"
+}
