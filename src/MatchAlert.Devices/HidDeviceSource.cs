@@ -23,12 +23,16 @@ public sealed class HidDeviceSource(
     public IReadOnlyList<ILightingDevice> Discover() =>
         Claim(bus.Enumerate()).Select(c => c.Driver.Create(c.Hid, c.Profile)).ToList();
 
-    /// <summary>Collections some driver could talk to but no profile describes: candidates for setup.</summary>
+    /// <summary>
+    /// Collections no profile describes that some driver offers to set up. Asked of the drivers' setup, not
+    /// of IsControlInterface: a driver may drive any profile it is given but only volunteer for its own
+    /// family, so a vendor-defined collection on a mouse or headset is not offered as a keyboard.
+    /// </summary>
     public IReadOnlyList<HidDeviceInfo> Unrecognised()
     {
         var all = bus.Enumerate();
         var claimed = Claim(all).Select(c => c.Hid.Path).ToHashSet(StringComparer.OrdinalIgnoreCase);
-        return all.Where(h => !claimed.Contains(h.Path) && drivers.Any(d => d.IsControlInterface(h))).ToList();
+        return all.Where(h => !claimed.Contains(h.Path) && SetupFor(h) is not null).ToList();
     }
 
     /// <summary>The recognised keyboards that are plugged in, for the tray to list.</summary>

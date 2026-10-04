@@ -6,6 +6,7 @@ using MatchAlert.App;
 using MatchAlert.Devices;
 using MatchAlert.Devices.Hid;
 using MatchAlert.Devices.Pulsar;
+using MatchAlert.Devices.Sayo;
 using MatchAlert.Devices.Via;
 using MatchAlert.Lcu;
 
@@ -61,7 +62,8 @@ internal static class Program
         // Another protocol is one more driver in this list. Order matters for setup only: the first
         // driver that can talk to an unknown keyboard sets it up, so vendor-specific drivers go before VIA.
         var pulsar = new PulsarDriver(bus, pending, log.Write);
-        return (new HidDeviceSource(bus, [pulsar, via], settings, pending, log.Write), via);
+        var sayo = new SayoDriver(bus, pending, log.Write);
+        return (new HidDeviceSource(bus, [pulsar, sayo, via], settings, pending, log.Write), via);
     }
 
     /// <summary>

@@ -24,6 +24,10 @@ internal sealed class FakeHidBus : IHidBus
     public static HidDeviceInfo PulsarBoot(ushort pid) =>
         new($@"\\?\hid#vid_3710&pid_{pid:x4}&mi_02", 0x3710, pid, 0xFF1C, 0x1C, 65, 65, "PULSAR BOOT");
 
+    /// <summary>A SayoDevice keyboard's vendor collection: 64-byte reports, report id 0x22.</summary>
+    public static HidDeviceInfo Sayo(ushort vid, ushort pid, string product, ushort usagePage = 0xFF00) =>
+        new($@"\\?\hid#vid_{vid:x4}&pid_{pid:x4}&col02", vid, pid, usagePage, 0x01, 64, 64, product);
+
     public static HidDeviceInfo KeyboardCollection(ushort vid, ushort pid, string product) =>
         new($@"\\?\hid#vid_{vid:x4}&pid_{pid:x4}&col01", vid, pid, 0x01, 0x06, 9, 2, product);
 
@@ -78,6 +82,7 @@ internal sealed class DeviceTestbed : IDisposable
     public List<string> Log { get; } = [];
     public ViaDriver Driver { get; private set; } = null!;
     public MatchAlert.Devices.Pulsar.PulsarDriver Pulsar { get; private set; } = null!;
+    public MatchAlert.Devices.Sayo.SayoDriver Sayo { get; private set; } = null!;
     public HidDeviceSource Source { get; private set; } = null!;
 
     /// <summary>A fresh driver and source over the same disk state, as after the app restarts.</summary>
@@ -85,8 +90,9 @@ internal sealed class DeviceTestbed : IDisposable
     {
         Driver = new ViaDriver(Bus, Pending, Log.Add, ViaKeyboardTests.NoWait);
         Pulsar = new MatchAlert.Devices.Pulsar.PulsarDriver(Bus, Pending, Log.Add, new MatchAlert.Devices.Pulsar.PulsarTiming(1, 1));
+        Sayo = new MatchAlert.Devices.Sayo.SayoDriver(Bus, Pending, Log.Add, new MatchAlert.Devices.Sayo.SayoTiming(1, 1));
         // Same order as Program.Devices: vendor drivers before VIA.
-        Source = new HidDeviceSource(Bus, [Pulsar, Driver], () => Settings, Pending, Log.Add);
+        Source = new HidDeviceSource(Bus, [Pulsar, Sayo, Driver], () => Settings, Pending, Log.Add);
     }
 
     public void Dispose()

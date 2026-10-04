@@ -50,15 +50,25 @@ so unplugging it always brings back your own settings.
 | Keychron Q1 HE 8K | Verified on hardware |
 | Pulsar PCMK 2HE TKL | **Unverified**: built from Pulsar's own configurator, not tested on a board |
 | Pulsar XBOARD MS | **Unverified**: same |
+| Pulsar PCMK 2 HE family (SayoDevice firmware) | **Unverified**: set up by the wizard, may not light at all (see below) |
 | Other Pulsar keyboards on the same protocol | Set up automatically by the wizard, unverified |
 | Other keyboards with VIA support | Set up with the wizard (below) |
 
 ### Pulsar keyboards
 
 Pulsar's current keyboards are not VIA keyboards: they are configured with Pulsar's web app,
-Bibimbap. The PCMK 2HE TKL and XBOARD MS use a lighting protocol of their own on the same raw HID
-interface, which this app speaks as Bibimbap does. Nobody has tried it on a real board yet, so it is
-careful: it never sends Bibimbap's "save" command, never touches the bootloader, and by default plays the
+Bibimbap, which speaks two different protocols depending on the model. Both are reimplemented here from
+Bibimbap's own code.
+
+- **PCMK 2HE TKL and XBOARD MS** use a lighting protocol of their own on the raw HID interface. They are
+  recognised as soon as they are plugged in.
+- **The PCMK 2 HE family** runs SayoDevice firmware. Bibimbap has no list of their names, so the setup
+  wizard sets one up from the name the keyboard reports, by reading only; there are no questions. One
+  thing is unknown here: Bibimbap always follows a lighting change with a "save all", which this app
+  never sends. If the firmware only shows lighting once it is saved, the keyboard will simply not light.
+  That is safe, but it is the first thing to check.
+
+Nobody has tried either on a real board yet, so the app is careful: it never sends Bibimbap's "save" command, never touches the bootloader, and by default plays the
 keyboard's own breathing effect so it writes to the keyboard only once per alert.
 
 **If you own one, you can verify it in a minute** (close Bibimbap first):

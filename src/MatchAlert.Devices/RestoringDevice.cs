@@ -90,7 +90,7 @@ internal sealed class RestoringDevice<TLink, TSnapshot>(
         var saved = entry.State.Deserialize<PendingState<TSnapshot>>(PendingState<TSnapshot>.Json)
             ?? throw new InvalidDataException("empty pending state");
         var now = link.Showing();
-        if (saved.Shown.Contains(now))
+        if (saved.Shown.Any(s => s.Effect == now.Effect && Near(s.Hue, now.Hue, wraps: true) && Near(s.Sat, now.Sat, wraps: false)))
         {
             link.Restore(saved.Snapshot);
             log($"{name}: restored the lighting an interrupted alert left behind ({saved.Snapshot})");
@@ -99,6 +99,13 @@ internal sealed class RestoringDevice<TLink, TSnapshot>(
         {
             log($"{name}: an interrupted alert's snapshot was discarded; the lighting has changed since ({now})");
         }
+    }
+
+    /// <summary>Within 2 steps: firmware that stores RGB rather than HSV hands back a hue or sat off by rounding.</summary>
+    private static bool Near(byte a, byte b, bool wraps)
+    {
+        int d = Math.Abs(a - b);
+        return (wraps ? Math.Min(d, 255 - d) : d) <= 2;
     }
 
     private sealed class Session(RestoringDevice<TLink, TSnapshot> device, TLink link, TSnapshot snapshot) : ILightingSession

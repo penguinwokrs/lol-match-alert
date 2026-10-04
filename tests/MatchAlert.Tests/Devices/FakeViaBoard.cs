@@ -54,8 +54,9 @@ internal sealed class FakeViaBoard : IRawHid
 
     public (byte Effect, byte Hue, byte Sat, byte Brightness, byte Speed) State => (Effect, Hue, Sat, Brightness, Speed);
 
-    public void Write(ReadOnlySpan<byte> payload)
+    public void Write(ReadOnlySpan<byte> payload, byte reportId = 0)
     {
+        if (reportId != 0) throw new InvalidOperationException($"this board has no report id {reportId}");
         if (Unplugged) throw new IOException("device not connected");
         if (payload.Length is 0 or > 32) throw new InvalidOperationException($"bad report length {payload.Length}");
         var p = Pad(payload.ToArray());

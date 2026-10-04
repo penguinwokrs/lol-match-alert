@@ -36,8 +36,9 @@ internal sealed class FakePulsarBoard(byte profile = 1, bool echoHeader = true) 
 
     public void QueueForeign(params byte[] payload) => _foreign.Enqueue(Pad(payload));
 
-    public void Write(ReadOnlySpan<byte> payload)
+    public void Write(ReadOnlySpan<byte> payload, byte reportId = 0)
     {
+        if (reportId != 0) throw new InvalidOperationException($"this board has no report id {reportId}");
         if (payload.Length is 0 or > 64) throw new InvalidOperationException($"bad report length {payload.Length}");
         var p = Pad(payload.ToArray());
         Packets.Add(p);
