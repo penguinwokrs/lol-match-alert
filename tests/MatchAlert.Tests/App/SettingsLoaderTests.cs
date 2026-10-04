@@ -86,6 +86,16 @@ public class SettingsLoaderTests
     }
 
     [Fact]
+    public void An_opt_in_profile_stays_off_until_switched_on()
+    {
+        const string optIn = """
+            { "id": "opt", "driver": "x", "match": { "vendorId": "0x0000" }, "effects": { "solid": 0 }, "enabledByDefault": false }
+            """;
+        Assert.False(Load(null, optIn).IsEnabled("opt"));
+        Assert.True(Load("""{ "devices": { "opt": { "enabled": true } } }""", optIn).IsEnabled("opt"));
+    }
+
+    [Fact]
     public void Devices_can_be_switched_off()
     {
         Assert.False(Load($$"""{ "devices": { "{{Q1}}": { "enabled": false } } }""").IsEnabled(Q1));
