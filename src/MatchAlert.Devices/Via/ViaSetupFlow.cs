@@ -4,6 +4,7 @@
 using System.Text;
 using MatchAlert.App;
 using MatchAlert.Devices.Hid;
+using MatchAlert.Devices.Resources;
 using MatchAlert.Devices.Setup;
 
 namespace MatchAlert.Devices.Via;
@@ -20,7 +21,7 @@ internal sealed class ViaSetupFlow(IHidBus bus, HidDeviceInfo hid, ViaTiming tim
 
     private const byte ProbeHue = 85, ProbeSat = 255, ProbeSpeed = 170, ProbeBrightness = 200;
 
-    public string DeviceName => string.IsNullOrWhiteSpace(hid.Product) ? $"USB device {hid.VendorId:X4}:{hid.ProductId:X4}" : hid.Product;
+    public string DeviceName => string.IsNullOrWhiteSpace(hid.Product) ? string.Format(Strings.Setup_UsbDevice, $"{hid.VendorId:X4}:{hid.ProductId:X4}") : hid.Product;
 
     public DeviceProfile? Run(IUserPrompt prompt)
     {
@@ -31,7 +32,7 @@ internal sealed class ViaSetupFlow(IHidBus bus, HidDeviceInfo hid, ViaTiming tim
         }
         catch (IOException)
         {
-            Unsupported(prompt, "It did not answer as a VIA keyboard.");
+            Unsupported(prompt, Strings.Unsupported_NotVia);
             return null;
         }
 
@@ -41,7 +42,7 @@ internal sealed class ViaSetupFlow(IHidBus bus, HidDeviceInfo hid, ViaTiming tim
             // channel 0 changed the effect and wedged the connection.
             if (kb.IsV3 && !kb.VerifyChannel())
             {
-                Unsupported(prompt, "Its lights are not on the channel this app knows how to drive.");
+                Unsupported(prompt, Strings.Unsupported_Channel);
                 return null;
             }
 
@@ -72,11 +73,13 @@ internal sealed class ViaSetupFlow(IHidBus bus, HidDeviceInfo hid, ViaTiming tim
                     ["via"] = new ViaOptions(ViaOptions.RgbMatrixChannel, resetOnEffect).ToJson(),
                 },
             };
-            var summary = $"{DeviceName} is ready.\n\n" +
-                $"Steady effect: {effects["solid"]}\n" +
-                (effects.TryGetValue("breathing", out int b) ? $"Pulsing effect: {b}\n" : "Pulsing effect: none found\n") +
-                $"Needs the reset workaround: {(resetOnEffect ? "yes" : "no")}";
-            return prompt.Choose(summary, ["Save", "Cancel"]) == 0 ? profile : null;
+            var summary = string.Join("\n",
+                string.Format(Strings.Setup_Ready, DeviceName),
+                "",
+                string.Format(Strings.Setup_SteadyEffect, effects["solid"]),
+                effects.TryGetValue("breathing", out int b) ? string.Format(Strings.Setup_PulsingEffect, b) : Strings.Setup_PulsingNone,
+                string.Format(Strings.Setup_ResetWorkaround, resetOnEffect ? Strings.Yes : Strings.No));
+            return prompt.Choose(summary, [Strings.Choice_Save, Strings.Choice_Cancel]) == 0 ? profile : null;
         }
     }
 
@@ -88,8 +91,8 @@ internal sealed class ViaSetupFlow(IHidBus bus, HidDeviceInfo hid, ViaTiming tim
             if (found.Count == 2) break;
             kb.Apply(n, ProbeHue, ProbeSat, ProbeSpeed, ProbeBrightness);
             var answer = prompt.Choose(
-                $"Look at {DeviceName}. How do its lights look now? (effect {n})",
-                ["Steady green", "Pulsing", "Something else / off"]);
+                string.Format(Strings.Setup_HowDoesItLook, DeviceName, n),
+                [Strings.Choice_Steady, Strings.Choice_Pulsing, Strings.Choice_Other]);
             switch (answer)
             {
                 case null: return null;
@@ -98,13 +101,12 @@ internal sealed class ViaSetupFlow(IHidBus bus, HidDeviceInfo hid, ViaTiming tim
             }
         }
         if (found.ContainsKey("solid")) return found;
-        prompt.Inform($"No steady effect was found on {DeviceName}, so it cannot show patterns.");
+        prompt.Inform(string.Format(Strings.Setup_NoSteady, DeviceName));
         return null;
     }
 
     private void Unsupported(IUserPrompt prompt, string why) => prompt.Inform(
-        $"{DeviceName} is not supported yet. {why}\n\n" +
-        "You can ask for it at github.com/penguinwokrs/lol-match-alert/issues with the details below.",
+        string.Format(Strings.Setup_Unsupported, DeviceName, why),
         details: $"{hid}\npath: {hid.Path}");
 
     internal static string Slug(string name)

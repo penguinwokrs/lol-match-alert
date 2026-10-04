@@ -5,6 +5,7 @@ using System.Diagnostics;
 using MatchAlert.App;
 using MatchAlert.Devices;
 using MatchAlert.Devices.Hid;
+using MatchAlert.Tray.Resources;
 
 namespace MatchAlert.Tray;
 
@@ -23,8 +24,8 @@ internal sealed class TrayContext : ApplicationContext
     private readonly NotifyIcon _icon;
     private readonly ToolStripMenuItem _status = new() { Enabled = false };
     private readonly ToolStripMenuItem _settingsError = new() { Visible = false };
-    private readonly ToolStripMenuItem _keyboards = new("Keyboards");
-    private readonly ToolStripMenuItem _autostart = new("Start with Windows") { CheckOnClick = true };
+    private readonly ToolStripMenuItem _keyboards = new(Strings.Menu_Keyboards);
+    private readonly ToolStripMenuItem _autostart = new(Strings.Menu_Autostart) { CheckOnClick = true };
     private bool _setupRunning;
     private bool _stopped;
 
@@ -49,12 +50,12 @@ internal sealed class TrayContext : ApplicationContext
             _settingsError,
             new ToolStripSeparator(),
             _keyboards,
-            new ToolStripMenuItem("Test lighting", null, (_, _) => TestLighting()),
-            new ToolStripMenuItem("Set up a keyboard…", null, (_, _) => _ = SetUpKeyboardAsync()),
-            new ToolStripMenuItem("Open settings folder", null, (_, _) => OpenSettingsFolder()),
+            new ToolStripMenuItem(Strings.Menu_Test, null, (_, _) => TestLighting()),
+            new ToolStripMenuItem(Strings.Menu_Setup, null, (_, _) => _ = SetUpKeyboardAsync()),
+            new ToolStripMenuItem(Strings.Menu_OpenSettings, null, (_, _) => OpenSettingsFolder()),
             _autostart,
             new ToolStripSeparator(),
-            new ToolStripMenuItem("Exit", null, (_, _) => Exit()),
+            new ToolStripMenuItem(Strings.Menu_Exit, null, (_, _) => Exit()),
         ]);
 
         _icon = new NotifyIcon { ContextMenuStrip = menu, Visible = true };
@@ -75,9 +76,9 @@ internal sealed class TrayContext : ApplicationContext
     {
         var text = status switch
         {
-            AlertStatus.Alerting => "Match found",
-            AlertStatus.Connected => "Waiting for a match",
-            _ => "Waiting for the League client",
+            AlertStatus.Alerting => Strings.Status_Alerting,
+            AlertStatus.Connected => Strings.Status_Connected,
+            _ => Strings.Status_WaitingForClient,
         };
         _status.Text = text;
         _icon.Text = $"{Caption}: {text}";
@@ -90,9 +91,9 @@ internal sealed class TrayContext : ApplicationContext
     {
         _settingsError.Visible = _settings.Error is not null;
         if (_settings.Error is not { } error) return;
-        _settingsError.Text = "Settings problem: click to open the folder";
+        _settingsError.Text = Strings.Menu_SettingsProblem;
         _settingsError.ToolTipText = error;
-        _icon.ShowBalloonTip(10_000, "Settings not applied", error + "\nThe previous settings are still in use.", ToolTipIcon.Warning);
+        _icon.ShowBalloonTip(10_000, Strings.Balloon_SettingsTitle, string.Format(Strings.Balloon_SettingsText, error), ToolTipIcon.Warning);
     }
 
     private void FillKeyboards()
@@ -102,23 +103,23 @@ internal sealed class TrayContext : ApplicationContext
         foreach (var (_, profile) in found)
         {
             var current = _settings.Current;
-            var state = current.IsEnabled(profile.Id) ? current.PatternNameFor(profile) : "off";
+            var state = current.IsEnabled(profile.Id) ? current.PatternNameFor(profile) : Strings.Keyboards_Off;
             var item = new ToolStripMenuItem($"{profile.Name}  ({state})")
             {
-                ToolTipText = $"id for settings.json: {profile.Id}\nclick to copy it",
+                ToolTipText = string.Format(Strings.Keyboards_ItemTooltip, profile.Id),
             };
             var id = profile.Id;
             item.Click += (_, _) => Clipboard.SetText(id);
             _keyboards.DropDownItems.Add(item);
         }
-        if (found.Count == 0) _keyboards.DropDownItems.Add(new ToolStripMenuItem("No set-up keyboard is connected") { Enabled = false });
+        if (found.Count == 0) _keyboards.DropDownItems.Add(new ToolStripMenuItem(Strings.Keyboards_None) { Enabled = false });
     }
 
     private void TestLighting()
     {
         if (Safely(_devices.Recognised, []).Count == 0)
         {
-            Inform("No set-up keyboard is connected. Connect it with a USB cable, or use \"Set up a keyboard…\".");
+            Inform(Strings.Test_NoKeyboard);
             return;
         }
         _ = _alerts.TestAsync(TimeSpan.FromSeconds(3), CancellationToken.None);
@@ -129,22 +130,20 @@ internal sealed class TrayContext : ApplicationContext
         if (_setupRunning) return;
         if (_alerts.Status == AlertStatus.Alerting)
         {
-            Inform("A match alert is playing. Try again once it is over.");
+            Inform(Strings.Setup_AlertPlaying);
             return;
         }
 
         var candidates = Safely(_devices.Unrecognised, []);
         if (candidates.Count == 0)
         {
-            Inform("There is no new keyboard to set up.\n\n" +
-                "Keyboards already set up are under Keyboards. A keyboard must be connected by USB cable " +
-                "(not wireless or Bluetooth) and support VIA.");
+            Inform(Strings.Setup_NothingNew);
             return;
         }
 
-        var prompt = new TaskDialogPrompt(_ui, "Set up a keyboard");
+        var prompt = new TaskDialogPrompt(_ui, Strings.Setup_Caption);
         var target = candidates.Count == 1 ? candidates[0]
-            : prompt.Choose("Which device is the keyboard to set up?", candidates.Select(Describe).ToList()) is int i ? candidates[i] : null;
+            : prompt.Choose(Strings.Setup_WhichDevice, candidates.Select(Describe).ToList()) is int i ? candidates[i] : null;
         if (target is null || _devices.SetupFor(target) is not { } flow) return;
 
         _setupRunning = true;
@@ -155,12 +154,12 @@ internal sealed class TrayContext : ApplicationContext
             if (profile is null) return;
             var path = _settings.SaveProfile(profile);
             _log.Write($"Setup: saved {path}");
-            Inform($"{profile.Name} is set up and will light up on the next match.\n\nUse \"Test lighting\" to see it now.");
+            Inform(string.Format(Strings.Setup_Done, profile.Name));
         }
         catch (Exception e)
         {
             _log.Write($"Setup failed: {e}");
-            Inform($"Setup stopped: {e.Message}");
+            Inform(string.Format(Strings.Setup_Stopped, e.Message));
         }
         finally
         {
@@ -172,7 +171,7 @@ internal sealed class TrayContext : ApplicationContext
     {
         if (Safely(_devices.Recognised, []).Count > 0 || Safely(_devices.Unrecognised, []).Count == 0) return;
         _icon.BalloonTipClicked += OnBalloon;
-        _icon.ShowBalloonTip(10_000, "No keyboard set up yet", "Click here to set up your keyboard.", ToolTipIcon.Info);
+        _icon.ShowBalloonTip(10_000, Strings.Balloon_NoKeyboardTitle, Strings.Balloon_NoKeyboardText, ToolTipIcon.Info);
 
         void OnBalloon(object? s, EventArgs e)
         {

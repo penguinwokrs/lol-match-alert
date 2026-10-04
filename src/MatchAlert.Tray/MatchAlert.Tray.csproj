@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
+    <NeutralResourcesLanguage>en</NeutralResourcesLanguage>
     <TargetFramework>net10.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <!-- Lets the desktop project build from WSL and on the Linux CI runner. -->
@@ -12,7 +13,6 @@
     <ApplicationIcon Condition="Exists('..\..\assets\app.ico')">..\..\assets\app.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
-    <InvariantGlobalization>true</InvariantGlobalization>
     <!-- One self-contained exe: nothing for the player to install first. Not trimmed: WinForms does
          not support trimming. -->
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
@@ -26,5 +26,16 @@
     <ProjectReference Include="..\MatchAlert.App\MatchAlert.App.csproj" />
     <ProjectReference Include="..\MatchAlert.Lcu\MatchAlert.Lcu.csproj" />
     <ProjectReference Include="..\MatchAlert.Devices\MatchAlert.Devices.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- MSBuild's own generator (not the Visual Studio designer), so the class regenerates on a plain
+         `dotnet build` from WSL or the Linux CI runner. English is the neutral culture: a language
+         with no translation gets English. -->
+    <EmbeddedResource Update="Resources\Strings.resx"
+                      StronglyTypedClassName="Strings"
+                      StronglyTypedNamespace="MatchAlert.Tray.Resources"
+                      StronglyTypedFileName="$(IntermediateOutputPath)Strings.g.cs"
+                      StronglyTypedLanguage="CSharp"
+                      Generator="" />
   </ItemGroup>
 </Project>

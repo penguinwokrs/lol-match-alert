@@ -2,6 +2,7 @@
 // Copyright (C) 2026 penguinwokrs
 
 using MatchAlert.Devices.Setup;
+using MatchAlert.Tray.Resources;
 
 namespace MatchAlert.Tray;
 
@@ -39,8 +40,8 @@ internal sealed class TaskDialogPrompt(Control ui, string caption) : IUserPrompt
         };
         if (details is not null)
         {
-            page.Expander = new TaskDialogExpander { Text = details, CollapsedButtonText = "Device details", Expanded = true };
-            var copy = new TaskDialogButton("Copy details") { AllowCloseDialog = false };
+            page.Expander = new TaskDialogExpander { Text = details, CollapsedButtonText = Strings.Prompt_DeviceDetails, Expanded = true };
+            var copy = new TaskDialogButton(Strings.Prompt_CopyDetails) { AllowCloseDialog = false };
             copy.Click += (_, _) => Clipboard.SetText(details);
             page.Buttons.Insert(0, copy);
         }

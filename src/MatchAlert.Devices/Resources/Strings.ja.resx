@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Setup_UsbDevice" xml:space="preserve">
+    <value>USB デバイス {0}</value>
+  </data>
+  <data name="Setup_Ready" xml:space="preserve">
+    <value>{0} の準備ができました。</value>
+  </data>
+  <data name="Setup_SteadyEffect" xml:space="preserve">
+    <value>点灯エフェクト: {0}</value>
+  </data>
+  <data name="Setup_PulsingEffect" xml:space="preserve">
+    <value>明滅エフェクト: {0}</value>
+  </data>
+  <data name="Setup_PulsingNone" xml:space="preserve">
+    <value>明滅エフェクト: 見つかりませんでした</value>
+  </data>
+  <data name="Setup_ResetWorkaround" xml:space="preserve">
+    <value>リセット対策: {0}</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>必要</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>不要</value>
+  </data>
+  <data name="Choice_Save" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="Choice_Cancel" xml:space="preserve">
+    <value>キャンセル</value>
+  </data>
+  <data name="Setup_HowDoesItLook" xml:space="preserve">
+    <value>{0} を見てください。いまどのように光っていますか？（エフェクト {1}）</value>
+  </data>
+  <data name="Choice_Steady" xml:space="preserve">
+    <value>緑で点灯</value>
+  </data>
+  <data name="Choice_Pulsing" xml:space="preserve">
+    <value>明滅している</value>
+  </data>
+  <data name="Choice_Other" xml:space="preserve">
+    <value>それ以外 / 消灯</value>
+  </data>
+  <data name="Setup_NoSteady" xml:space="preserve">
+    <value>{0} では点灯エフェクトが見つからなかったため、パターンを表示できません。</value>
+  </data>
+  <data name="Setup_Unsupported" xml:space="preserve">
+    <value>{0} にはまだ対応していません。{1}
+
+下の詳細を添えて github.com/penguinwokrs/lol-match-alert/issues で対応を依頼できます。</value>
+  </data>
+  <data name="Unsupported_NotVia" xml:space="preserve">
+    <value>VIA キーボードとして応答しませんでした。</value>
+  </data>
+  <data name="Unsupported_Channel" xml:space="preserve">
+    <value>このアプリが操作できるチャネルにライトがありません。</value>
+  </data>
+</root>

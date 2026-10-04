@@ -57,8 +57,9 @@ public sealed class ResolvedSettings
     private readonly IReadOnlySet<string> _disabled;
 
     internal ResolvedSettings(IReadOnlyDictionary<string, Pattern> patterns, IReadOnlyList<DeviceProfile> profiles,
-        IReadOnlyDictionary<string, string> patternByDevice, IReadOnlySet<string> disabled, TimeSpan maxAlert)
+        IReadOnlyDictionary<string, string> patternByDevice, IReadOnlySet<string> disabled, TimeSpan maxAlert, string language)
     {
+        Language = language;
         Patterns = patterns;
         Profiles = profiles;
         _patternByDevice = patternByDevice;
@@ -68,6 +69,9 @@ public sealed class ResolvedSettings
 
     public IReadOnlyDictionary<string, Pattern> Patterns { get; }
     public IReadOnlyList<DeviceProfile> Profiles { get; }
+
+    /// <summary>"auto" (the Windows display language), "en" or "ja". Read once at startup.</summary>
+    public string Language { get; }
 
     /// <summary>The safety stop: an alert never runs longer than this.</summary>
     public TimeSpan MaxAlert { get; }

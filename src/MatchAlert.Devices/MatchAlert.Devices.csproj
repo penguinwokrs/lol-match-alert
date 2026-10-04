@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <NeutralResourcesLanguage>en</NeutralResourcesLanguage>
     <TargetFramework>net10.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
@@ -8,5 +9,16 @@
   <ItemGroup>
     <ProjectReference Include="..\MatchAlert.Domain\MatchAlert.Domain.csproj" />
     <ProjectReference Include="..\MatchAlert.App\MatchAlert.App.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- MSBuild's own generator (not the Visual Studio designer), so the class regenerates on a plain
+         `dotnet build` from WSL or the Linux CI runner. English is the neutral culture: a language
+         with no translation gets English. -->
+    <EmbeddedResource Update="Resources\Strings.resx"
+                      StronglyTypedClassName="Strings"
+                      StronglyTypedNamespace="MatchAlert.Devices.Resources"
+                      StronglyTypedFileName="$(IntermediateOutputPath)Strings.g.cs"
+                      StronglyTypedLanguage="CSharp"
+                      Generator="" />
   </ItemGroup>
 </Project>

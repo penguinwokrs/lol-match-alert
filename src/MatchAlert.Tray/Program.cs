@@ -27,6 +27,7 @@ internal static class Program
 
         var log = new FileLog(AppPaths.LogFile);
         log.Write($"Starting {Application.ProductVersion}");
+        ApplyLanguage(log);
         ApplicationConfiguration.Initialize();
         Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
         Application.ThreadException += (_, e) => log.Write($"Unexpected error: {e.Exception}");
@@ -58,6 +59,23 @@ internal static class Program
         var via = new ViaDriver(bus, pending, log.Write);
         // Another protocol is one more driver in this list.
         return (new HidDeviceSource(bus, [via], settings, pending, log.Write), via);
+    }
+
+    /// <summary>
+    /// Before anything shows text: the menu, the dialogs and the first-run settings template all read
+    /// the UI culture once. "auto" leaves it at the Windows display language; a language with no
+    /// translation falls back to English.
+    /// </summary>
+    private static void ApplyLanguage(FileLog log)
+    {
+        string language;
+        try { language = SettingsLoader.Load(SettingsSources.FromDisk(AppPaths.SettingsDirectory)).Language; }
+        catch (Exception e) when (e is SettingsException or IOException) { language = "auto"; }
+        if (language == "auto") return;
+        var culture = System.Globalization.CultureInfo.GetCultureInfo(language);
+        System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = culture;
+        System.Globalization.CultureInfo.CurrentUICulture = culture;
+        log.Write($"Language: {language}");
     }
 
     [DllImport("kernel32.dll")]
