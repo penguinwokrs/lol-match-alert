@@ -7,6 +7,8 @@
   "driver": "via",
   "match": { "vendorId": "0x3434", "productIds": [ "0x1010", "0x1011", "0x1012" ], "productString": "Q1 HE" },
   "effects": { "solid": 1, "breathing": 2 },
+  // Color writes take ~3 ms on this board (measured); 100 ms is a floor chosen to stay well clear of
+  // that, not a measured flicker limit.
   "minStepMs": 100,
   // rgb_matrix is custom channel 3. The firmware resets color and brightness ~50-150 ms after an
   // effect change, which resetOnEffect works around.

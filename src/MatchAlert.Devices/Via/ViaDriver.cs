@@ -37,6 +37,8 @@ public sealed class ViaDriver(IHidBus bus, PendingSnapshots pending, Action<stri
     /// 44 back as 42), so a later snapshot that still reads the read-back means "untouched since",
     /// and the value we wrote is the honest one. Without this a dim backlight walks down to dark one
     /// alert at a time (kbd-signal #58).
+    /// ponytail: in memory only, so the first alert after the app restarts can lose one or two units
+    /// on a dim backlight. Persist it next to the pending snapshots if that is ever noticed.
     /// </summary>
     private readonly ConcurrentDictionary<string, (byte Written, byte ReadBack)> _brightnessEchoes = new();
 
@@ -68,7 +70,8 @@ public sealed class ViaDriver(IHidBus bus, PendingSnapshots pending, Action<stri
         }
     }
 
-    internal ViaKeyboard Open(HidDeviceInfo device, ViaOptions options)
+    /// <summary>Opens the board directly, for diagnostics and setup. Lighting sessions go through <see cref="Create"/>.</summary>
+    public ViaKeyboard Open(HidDeviceInfo device, ViaOptions options)
     {
         var raw = bus.Open(device);
         try { return new ViaKeyboard(raw, options.Channel, options.ResetOnEffect, _timing); }

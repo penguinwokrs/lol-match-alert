@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <!-- Lets the desktop project build from WSL and on the Linux CI runner. -->
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <AssemblyName>lol-match-alert</AssemblyName>
+    <RootNamespace>MatchAlert.Tray</RootNamespace>
+    <AssemblyTitle>lol-match-alert</AssemblyTitle>
+    <Description>Lights up the keyboard when League of Legends finds a match</Description>
+    <ApplicationIcon Condition="Exists('..\..\assets\app.ico')">..\..\assets\app.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <!-- One self-contained exe: nothing for the player to install first. Not trimmed: WinForms does
+         not support trimming. -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MatchAlert.Domain\MatchAlert.Domain.csproj" />
+    <ProjectReference Include="..\MatchAlert.App\MatchAlert.App.csproj" />
+    <ProjectReference Include="..\MatchAlert.Lcu\MatchAlert.Lcu.csproj" />
+    <ProjectReference Include="..\MatchAlert.Devices\MatchAlert.Devices.csproj" />
+  </ItemGroup>
+</Project>

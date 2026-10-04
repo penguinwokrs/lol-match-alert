@@ -78,7 +78,9 @@ public sealed class ViaKeyboard : IDisposable
     }
 
     /// <summary>
-    /// Writes everything, effect included, the careful way. Returns false if the color could not be
+    /// Writes everything, effect included, the careful way. On a reset-prone board this takes ~700 ms
+    /// (the dark hold plus the brightness rewrite window), so the first step of an alert shows late.
+    /// ponytail: once per alert by design; later steps are color-only writes of ~3 ms. Returns false if the color could not be
     /// confirmed; on a reset-prone board the LEDs are then left dark rather than showing the reset's red.
     /// </summary>
     public bool Apply(byte effect, byte hue, byte sat, byte? speed, byte brightness)
