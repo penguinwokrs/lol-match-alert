@@ -34,7 +34,7 @@ The League client exposes a local WebSocket (WAMP 1.0) on the port and password 
 its `lockfile`. The script subscribes to one event,
 `OnJsonApiEvent_lol-gameflow_v1_gameflow-phase`, and alerts when the phase becomes
 `ReadyCheck`. Measured on a live client, that event fires in the same millisecond as the
-ready-check dialog appears, and exactly once per match.
+ready-check state becomes `InProgress`, and exactly once per match.
 
 Lifecycle for reference: `Lobby → Matchmaking → ReadyCheck → ChampSelect → GameStart → InProgress`.
 Custom games skip `ReadyCheck`, so no alert there.

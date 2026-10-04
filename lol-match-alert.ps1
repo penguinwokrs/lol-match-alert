@@ -7,7 +7,7 @@ param(
     [switch]$Test
 )
 $ErrorActionPreference = 'Stop'
-$Event = 'OnJsonApiEvent_lol-gameflow_v1_gameflow-phase'
+$EventName = 'OnJsonApiEvent_lol-gameflow_v1_gameflow-phase'
 
 function Write-Log($msg) { "$(Get-Date -Format 'HH:mm:ss') $msg" }
 
@@ -37,7 +37,7 @@ function Handle-Frame([string]$frame) {
 }
 
 if ($Test) {
-    Handle-Frame "[8,`"$Event`",{`"data`":`"ReadyCheck`",`"eventType`":`"Update`",`"uri`":`"/lol-gameflow/v1/gameflow-phase`"}]"
+    Handle-Frame "[8,`"$EventName`",{`"data`":`"ReadyCheck`",`"eventType`":`"Update`",`"uri`":`"/lol-gameflow/v1/gameflow-phase`"}]"
     exit
 }
 
@@ -60,9 +60,9 @@ while ($true) {
         $ws.Options.SetRequestHeader('Authorization', "Basic $auth")
         if ($PSVersionTable.PSVersion.Major -ge 7) { $ws.Options.RemoteCertificateValidationCallback = $trust }   # .NET Core ignores ServicePointManager
         $ws.ConnectAsync([Uri]"wss://127.0.0.1:$($lf[2])/", [Threading.CancellationToken]::None).Wait()
-        $sub = [Text.Encoding]::UTF8.GetBytes("[5, `"$Event`"]")
+        $sub = [Text.Encoding]::UTF8.GetBytes("[5, `"$EventName`"]")
         $ws.SendAsync([ArraySegment[byte]]$sub, 'Text', $true, [Threading.CancellationToken]::None).Wait()
-        Write-Log "connected to LCU on port $($lf[2]), waiting for a match"
+        Write-Log "connected to LCU on port $($lf[2]), subscribed to $EventName, waiting for a match"
         while ($ws.State -eq 'Open') {
             $sb = New-Object Text.StringBuilder
             do {
