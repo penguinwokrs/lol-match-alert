@@ -1,0 +1,17 @@
+lol-match-alert
+Copyright (C) 2026 penguinwokrs
+Licensed under the GNU General Public License v3.0 (see LICENSE).
+
+This project reimplements, in C#, protocol knowledge first worked out and measured on real hardware
+by kbd-signal (https://github.com/Sora-bluesky/kbd-signal, MIT License, Copyright (c) sora
+(Sora-bluesky)): the VIA raw HID lighting commands, the Keychron Q1 HE 8K's color and brightness
+reset after an effect change and the dark-hold workaround for it, the brightness revert window, the
+lossy VIA v3 brightness round trip, and verifying a custom channel with a speed round trip. No kbd-signal
+source code is included.
+
+The SetupAPI and HID declarations are adapted from OpenInzone
+(https://github.com/penguinwokrs/openinzone, GPL-3.0, same author).
+
+League of Legends is a trademark of Riot Games, Inc. This project is not affiliated with, endorsed
+or sponsored by Riot Games. It reads the League client's local, undocumented API and never changes
+what the client does. Keychron is a trademark of its owner and is named only to identify hardware.
