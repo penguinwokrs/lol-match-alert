@@ -8,6 +8,8 @@ when the ready check is over. Tab out, make tea, look at the keyboard.
 > **Not affiliated with Riot Games.** This reads the League client's local, unofficial API. It never
 > accepts the ready check for you and never changes what the client does.
 
+[mock](https://github.com/user-attachments/assets/49666ce6-79f4-4a0c-8f22-7c1076297ea1)
+
 ## Install
 
 Download `lol-match-alert-<version>-setup.exe` from
